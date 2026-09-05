@@ -141,12 +141,36 @@ function injectChrome() {
           </button>
         </div>
       </header>
-      <div class="search-overlay" id="site-search" hidden>
-        <div class="search-panel" role="dialog" aria-modal="true" aria-labelledby="search-title">
-          <div class="search-bar">
-            <p id="search-title">بحث في منتجات بريانكا</p>
-            <input class="search-input" type="search" placeholder="اسم المنتج، المكونات، أو الإنجليزية..." autocomplete="off">
-            <button class="search-close" type="button" aria-label="إغلاق البحث">إغلاق</button>
+      <div class="search-overlay" id="site-search" hidden aria-hidden="true">
+        <div class="search-atmos" aria-hidden="true">
+          <div class="search-aurora"></div>
+          <div class="search-vignette"></div>
+          <div class="search-grain"></div>
+          <div class="search-frame"><span></span><span></span><span></span><span></span></div>
+        </div>
+        <div class="search-stage" role="dialog" aria-modal="true" aria-labelledby="search-title">
+          <div class="search-head">
+            <div>
+              <p class="search-kicker">PRIYANKA · CATALOG</p>
+              <h2 id="search-title">ابحثوا في بريانكا</h2>
+            </div>
+            <button class="search-close" type="button" aria-label="إغلاق البحث">
+              <span>إغلاق</span>
+              <kbd>Esc</kbd>
+            </button>
+          </div>
+          <label class="search-field-lux">
+            <svg class="search-lens" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 20.49 21.49 19l-5.99-5zM9.5 14C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <input class="search-input" type="search" placeholder="بطيخ، صابون بلدي، خميرة، African..." autocomplete="off" enterkeyhint="search">
+          </label>
+          <div class="search-chips" data-search-chips>
+            <button type="button" data-q="بطيخ">بطيخ</button>
+            <button type="button" data-q="فراولة">فراولة</button>
+            <button type="button" data-q="صابون">صابون</button>
+            <button type="button" data-q="خميرة">خميرة</button>
+            <button type="button" data-q="African">African</button>
+            <button type="button" data-q="حمام">حمام</button>
+            <button type="button" data-q="زيت">زيت</button>
           </div>
           <div class="search-results" data-search-results></div>
         </div>
@@ -749,46 +773,120 @@ function setupSearch() {
   const results = overlay?.querySelector("[data-search-results]");
   if (!overlay || !input || !results) return;
 
+  let active = -1;
+  let closeTimer = 0;
+
+  const catName = (id) => categories.find((cat) => cat.id === id)?.name || "";
+  const hitsEls = () => [...results.querySelectorAll(".search-hit")];
+
+  const hitMarkup = (item, extra = "") => {
+    const q = input.value.trim();
+    const meta = [item.en, item.size].filter(Boolean).join(" · ");
+    const cat = catName(item.cat);
+    return `
+      <a class="search-hit ${extra}" href="/products.html?id=${esc(item.id)}&q=${encodeURIComponent(q)}">
+        <img src="${esc(item.img)}" alt="" width="88" height="88">
+        <span class="search-hit-copy">
+          ${cat ? `<small class="search-hit-cat">${esc(cat)}</small>` : ""}
+          <strong>${esc(item.name)}</strong>
+          ${meta ? `<em>${esc(meta)}</em>` : ""}
+        </span>
+        <span class="search-hit-go">عرض</span>
+      </a>`;
+  };
+
+  const setActive = (index) => {
+    const items = hitsEls();
+    if (!items.length) {
+      active = -1;
+      return;
+    }
+    active = (index + items.length) % items.length;
+    items.forEach((el, i) => el.classList.toggle("is-on", i === active));
+    items[active]?.scrollIntoView({ block: "nearest" });
+  };
+
   const paint = () => {
     const q = input.value.trim();
+    overlay.querySelectorAll("[data-search-chips] [data-q]").forEach((chip) => {
+      chip.classList.toggle("is-on", foldSearch(chip.dataset.q) && foldSearch(q).includes(foldSearch(chip.dataset.q)));
+    });
     if (!foldSearch(q)) {
-      results.innerHTML = `<p class="search-hint">ابحثوا بالعربية أو الإنجليزية: بطيخ، صابون، African، خميرة...</p>`;
+      const picks = products.filter((item) => item.featured).slice(0, 4);
+      const show = picks.length ? picks : products.slice(0, 4);
+      results.innerHTML = `
+        <p class="search-hint">اكتبوا بالعربية أو الإنجليزية — النتائج تظهر فورًا.</p>
+        ${
+          show.length
+            ? `<p class="search-idle-kicker">مختارات من الكتالوج</p>
+               <div class="search-mosaic">${show.map((item) => hitMarkup(item, "is-tile")).join("")}</div>`
+            : ""
+        }`;
+      active = -1;
       return;
     }
     const hits = products.filter((item) => productMatches(item, q)).slice(0, 8);
     if (!hits.length) {
-      results.innerHTML = `<p class="search-empty">لا توجد نتائج لـ «${esc(q)}».</p>`;
+      results.innerHTML = `<p class="search-empty">لا توجد نتائج لـ «${esc(q)}». جرّبوا اسمًا أقصر أو مكوّنًا واحدًا.</p>`;
+      active = -1;
       return;
     }
-    results.innerHTML = hits
-      .map(
-        (item) => `
-        <a class="search-hit" href="/products.html?id=${esc(item.id)}&q=${encodeURIComponent(q)}">
-          <img src="${esc(item.img)}" alt="" width="56" height="56">
-          <span>
-            <strong>${esc(item.name)}</strong>
-            <small>${esc(item.en || "")} · ${esc(item.size || "")}</small>
-          </span>
-        </a>`
-      )
-      .join("");
+    results.innerHTML = `<p class="search-count">${hits.length} منتج مطابق</p>${hits.map((item) => hitMarkup(item)).join("")}`;
+    active = -1;
   };
 
-  const open = () => {
+  const open = (originEl) => {
+    window.clearTimeout(closeTimer);
+    if (originEl?.getBoundingClientRect) {
+      const box = originEl.getBoundingClientRect();
+      overlay.style.setProperty("--sx", `${box.left + box.width / 2}px`);
+      overlay.style.setProperty("--sy", `${box.top + box.height / 2}px`);
+    } else {
+      overlay.style.setProperty("--sx", "50%");
+      overlay.style.setProperty("--sy", "10%");
+    }
     overlay.hidden = false;
+    overlay.setAttribute("aria-hidden", "false");
     document.body.classList.add("search-open-page");
-    input.focus();
+    document.body.classList.remove("nav-open");
+    document.querySelector("[data-nav]")?.classList.remove("is-open");
+    document.querySelector(".nav-toggle")?.setAttribute("aria-expanded", "false");
+    document.querySelectorAll(".search-open").forEach((btn) => btn.setAttribute("aria-expanded", "true"));
+    requestAnimationFrame(() => overlay.classList.add("is-open"));
     paint();
-  };
-  const close = () => {
-    overlay.hidden = true;
-    document.body.classList.remove("search-open-page");
+    window.setTimeout(() => input.focus(), prefersReducedMotion() ? 0 : 180);
   };
 
-  document.querySelectorAll(".search-open").forEach((btn) => btn.addEventListener("click", open));
+  const close = (immediate = false) => {
+    overlay.classList.remove("is-open");
+    overlay.setAttribute("aria-hidden", "true");
+    document.querySelectorAll(".search-open").forEach((btn) => btn.setAttribute("aria-expanded", "false"));
+    const finish = () => {
+      overlay.hidden = true;
+      document.body.classList.remove("search-open-page");
+    };
+    if (immediate || prefersReducedMotion()) {
+      window.clearTimeout(closeTimer);
+      finish();
+      return;
+    }
+    closeTimer = window.setTimeout(finish, 560);
+  };
+
+  document.querySelectorAll(".search-open").forEach((btn) => {
+    btn.setAttribute("aria-expanded", "false");
+    btn.addEventListener("click", () => open(btn));
+  });
   overlay.querySelector(".search-close")?.addEventListener("click", close);
   overlay.addEventListener("click", (event) => {
-    if (event.target === overlay) close();
+    if (event.target === overlay || event.target.closest(".search-atmos")) close();
+  });
+  overlay.querySelector("[data-search-chips]")?.addEventListener("click", (event) => {
+    const chip = event.target.closest("[data-q]");
+    if (!chip) return;
+    input.value = chip.dataset.q;
+    input.focus();
+    paint();
   });
   input.addEventListener("input", paint);
   results.addEventListener("click", (event) => {
@@ -799,13 +897,29 @@ function setupSearch() {
     if (!product || !document.querySelector("#product-modal")) return;
     if (page !== "home" && page !== "products") return;
     event.preventDefault();
-    close();
+    close(true);
     openModal(product);
+  });
+  overlay.addEventListener("keydown", (event) => {
+    if (overlay.hidden) return;
+    const items = hitsEls();
+    if (event.key === "ArrowDown" && items.length) {
+      event.preventDefault();
+      setActive(active + 1);
+    } else if (event.key === "ArrowUp" && items.length) {
+      event.preventDefault();
+      setActive(active < 0 ? items.length - 1 : active - 1);
+    } else if (event.key === "Enter" && items.length) {
+      const target = items[active] || (foldSearch(input.value) ? items[0] : null);
+      if (!target) return;
+      event.preventDefault();
+      target.click();
+    }
   });
   document.addEventListener("keydown", (event) => {
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
       event.preventDefault();
-      open();
+      overlay.hidden ? open() : close();
     }
     if (event.key === "/" && !event.ctrlKey && !event.metaKey && document.activeElement?.tagName !== "INPUT" && document.activeElement?.tagName !== "TEXTAREA") {
       event.preventDefault();
