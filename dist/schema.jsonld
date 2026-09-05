@@ -1,0 +1,681 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "/#org",
+      "name": "بريانكا للتجميل",
+      "alternateName": [
+        "Priyanka Cosmetics",
+        "Priyanka Egypt",
+        "بريانكا مصر"
+      ],
+      "telephone": "+201272430202",
+      "sameAs": [
+        "https://www.facebook.com/priyanka.egypt/"
+      ],
+      "founder": {
+        "@type": "Person",
+        "name": "إيهاب فارس"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "Egypt"
+      },
+      "brand": {
+        "@id": "/#brand"
+      },
+      "logo": {
+        "@id": "/#logo"
+      }
+    },
+    {
+      "@type": "Brand",
+      "@id": "/#brand",
+      "name": "بريانكا للتجميل",
+      "slogan": "FROM NATURE FOR SKIN",
+      "logo": {
+        "@id": "/#logo"
+      }
+    },
+    {
+      "@type": "ImageObject",
+      "@id": "/#logo",
+      "contentUrl": "/images/logo.jpg",
+      "caption": "شعار بريانكا للتجميل"
+    },
+    {
+      "@type": "OnlineBusiness",
+      "@id": "/#business",
+      "name": "بريانكا للتجميل",
+      "parentOrganization": {
+        "@id": "/#org"
+      },
+      "telephone": "+201272430202",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "EG"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "Egypt"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "/#website",
+      "name": "بريانكا للتجميل",
+      "inLanguage": "ar-EG",
+      "publisher": {
+        "@id": "/#org"
+      },
+      "dateModified": "2026-09-04"
+    },
+    {
+      "@type": "ItemList",
+      "@id": "/#catalog",
+      "name": "كتالوج بريانكا للتجميل",
+      "numberOfItems": 28,
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "item": {
+            "@type": "Product",
+            "name": "مقشر بودي ديزرتس بالبطيخ",
+            "alternateName": "Body Desserts · Watermelon",
+            "image": "/images/0cd14f51.jpg",
+            "description": "مقشر جسم عميق التنظيف من خط Body Desserts بنكهة البطيخ. يقشر بلطف ويساعد البشرة على امتصاص العناية بعدها. عبوة 1 كجم — مناسب للاستخدام المنزلي والصالونات.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "1 كجم"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "item": {
+            "@type": "Product",
+            "name": "مقشر بودي ديزرتس بالفراولة",
+            "alternateName": "Body Desserts · Strawberry",
+            "image": "/images/9f84cca5.jpg",
+            "description": "مقشر جسم برائحة الفراولة من مجموعة الحلويات للجسم. تنظيف لطيف وملمس سبا فاخر في عبوة كيلو.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "1 كجم"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "item": {
+            "@type": "Product",
+            "name": "مقشر بودي ديزرتس مشمش وخوخ",
+            "alternateName": "Body Desserts · Apricot & Peach",
+            "image": "/images/4bf3d3bc.jpg",
+            "description": "مقشر عميق التنظيف بنفحات المشمش والخوخ. مثالي لتجديد ملمس البشرة قبل المرطب.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "1 كجم"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "item": {
+            "@type": "Product",
+            "name": "مقشر بودي ديزرتس جوز هند وفانيليا",
+            "alternateName": "Body Desserts · Coconut & Vanilla",
+            "image": "/images/3598af8b.jpg",
+            "description": "مقشر كريمي برائحة جوز الهند والفانيليا لتجربة سبا منزلية دافئة.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "1 كجم"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 5,
+          "item": {
+            "@type": "Product",
+            "name": "مقشر الملح بالخزامى وجوز الهند",
+            "alternateName": "Salt Scrub · Lavender & Coconut",
+            "image": "/images/d64aee30.jpg",
+            "description": "مقشر ملح بزيت الخزامى الأساسي وزيت جوز الهند. يقشر ويرطّب برائحة استرخاء.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "1 كجم"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 6,
+          "item": {
+            "@type": "Product",
+            "name": "مقشر الملح بزيت الأركان والكركم",
+            "alternateName": "Salt Scrub · Argan & Turmeric",
+            "image": "/images/80c659fc.jpg",
+            "description": "تركيبة مغربية بطابع الحمام: ملح مع زيت الأركان ومسحوق الكركم لتوريد وإشراق البشرة.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "1 كجم"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 7,
+          "item": {
+            "@type": "Product",
+            "name": "مقشر الملح ليتل سيكرت وإكليل الجبل",
+            "alternateName": "Salt Scrub · Little Secret & Rosemary",
+            "image": "/images/4926b659.jpg",
+            "description": "مقشر ملح بنفحات ليتل سيكرت والروز ماري والقرفة مع لمسة الحمضيات.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "1 كجم"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 8,
+          "item": {
+            "@type": "Product",
+            "name": "مقشر الملح تشيز كيك وكركديه",
+            "alternateName": "Salt Scrub · Cheesecake & Hibiscus",
+            "image": "/images/d54cd798.jpg",
+            "description": "مقشر فاخر بتشيز كيك وزهرة الكركديه وزبدة الشيا — حلو للبشرة لا للأكل.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "1 كجم"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 9,
+          "item": {
+            "@type": "Product",
+            "name": "الصابون البلدي المغربي",
+            "alternateName": "Moroccan Black Soap",
+            "image": "/images/e43b3cea.jpg",
+            "description": "صابون بلدي مغربي كلاسيكي للحمام البخاري. يُستخدم مع الكيس لتجديد البشرة قبل الزيوت والمرطبات.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "1 كجم"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 10,
+          "item": {
+            "@type": "Product",
+            "name": "الصابون البلدي المغربي بالزيتون",
+            "alternateName": "Moroccan Black Soap · Olive",
+            "image": "/images/f4558b57.jpg",
+            "description": "تركيبة بلدي بغنى الزيتون وزيت الزيتون، بعبوة كيلو للصالونات والاستخدام المنزلي.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "1 كجم"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 11,
+          "item": {
+            "@type": "Product",
+            "name": "دلكة العروس السودانية",
+            "alternateName": "Dilka Bridal Scrub · Sudanese",
+            "image": "/images/66449721.jpg",
+            "description": "دلكة سودانية تقليدية للعروس والجسم، بلمسة تراثية ورائحة دافئة.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "300 جم"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 12,
+          "item": {
+            "@type": "Product",
+            "name": "سويت الأميرات السودانية",
+            "alternateName": "Sudanese Princesses Sweet",
+            "image": "/images/5ce0f015.jpg",
+            "description": "سويت بالخمرة والدلكة وزيت السعد وزبدة الشيا — عناية تراثية للجسم.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "250 جم"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 13,
+          "item": {
+            "@type": "Product",
+            "name": "ملح الفنكوش وأملاح البانيو",
+            "alternateName": "El Fankoush Milk Salt",
+            "image": "/images/37271b64.jpg",
+            "description": "ملح حليب بالبطيخ مع مجموعة أملاح باديكير وبانيو بألوان متعددة للاسترخاء.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "500 مل / 750 مل"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 14,
+          "item": {
+            "@type": "Product",
+            "name": "شامبو الخلطة الأفريقية العجيبة",
+            "alternateName": "African Wonder Mix Shampoo",
+            "image": "/images/01ac43a8.jpg",
+            "description": "شامبو بالخلطة الأفريقية والزيوت الطبيعية. يساعد على ترطيب الشعر ومظهر الكثافة، مع علبة عرض احترافية.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "250 جم"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 15,
+          "item": {
+            "@type": "Product",
+            "name": "شامبو الخلطة الإفريقية معالج بالكيراتين",
+            "alternateName": "African Magic Mix · Keratin",
+            "image": "/images/87eef9fa.jpg",
+            "description": "تركيبة بالكيراتين وزبدة الشيا للعناية بالتساقط ومظهر الشعر الثقيل اللامع.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "250 جم"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 16,
+          "item": {
+            "@type": "Product",
+            "name": "شامبو خميرة البيرة لتكثيف الشعر",
+            "alternateName": "Beer Yeast Shampoo",
+            "image": "/images/01417384.png",
+            "description": "شامبو خميرة البيرة سريع المفعول لتكثيف الشعر. خاص بالتصدير — تأكدوا من شعار بريانكا البارز على العبوة.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "250 جم"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 17,
+          "item": {
+            "@type": "Product",
+            "name": "كريم خميرة البيرة لتكثيف الشعر",
+            "alternateName": "Beer Yeast Cream",
+            "image": "/images/9d86f94f.jpg",
+            "description": "كريم كثيف بنكهات العناية بالشعر، بتركيبة خميرة البيرة وكيراتين طبيعي.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "عبوة كريم"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 18,
+          "item": {
+            "@type": "Product",
+            "name": "زيت المشاط السعودي الخام",
+            "alternateName": "Raw Saudi Al-Mishat Oil",
+            "image": "/images/140910b6.jpg",
+            "description": "زيت مشاط مطول للشعر، يُقدَّم للعناية بالتساقط والقشرة بتركيبة عشبية فاخرة.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "250 مل"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 19,
+          "item": {
+            "@type": "Product",
+            "name": "كريم المشاط السعودي الخام",
+            "alternateName": "Raw Saudi Comb Cream",
+            "image": "/images/45a087e3.jpg",
+            "description": "كريم مشاط لتطويل الشعر والعناية بالتساقط والقشرة. منتج مصري مُعدّ للتصدير.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "250 مل"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 20,
+          "item": {
+            "@type": "Product",
+            "name": "زيت حشيش للشعر",
+            "alternateName": "Oil Hashesh for Hair",
+            "image": "/images/58dbb939.jpg",
+            "description": "زيت شعر عشبي بتركيبة طبيعية خالية من الكيماويات الثقيلة، بعبوة رش للاستخدام اليومي.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "125 مل"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 21,
+          "item": {
+            "@type": "Product",
+            "name": "غسول وجل العرقسوس",
+            "alternateName": "Licorice Root Cleanser & Gel",
+            "image": "/images/329eff79.jpg",
+            "description": "غسول وجه مهدئ مرطب وجل عرقسوس لتهدئة البشرة ولمعة طبيعية.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "250 مل / 500 جم"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 22,
+          "item": {
+            "@type": "Product",
+            "name": "جل شيفنج نبت السعد",
+            "alternateName": "Cyperus Shaving Gel & Makeup Remover",
+            "image": "/images/b9527863.png",
+            "description": "جل نبت السعد متعدد الاستخدام: شيفنج ومزيل مكياج. من الطبيعة… للبشرة.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "بخاخ"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 23,
+          "item": {
+            "@type": "Product",
+            "name": "زيت مساج ساخن جوز هند وفانيليا",
+            "alternateName": "Hot Massage Oil · Coconut & Vanilla",
+            "image": "/images/c8cea0a7.jpg",
+            "description": "زيت مساج معطر بجوز الهند والفانيليا، مع عرض هدية بيكيني بالم ورولر.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "150 مل"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 24,
+          "item": {
+            "@type": "Product",
+            "name": "زيت مساج ساخن بالفراولة",
+            "alternateName": "Hot Massage Oil · Strawberry",
+            "image": "/images/038dfb48.jpg",
+            "description": "زيت مساج بنكهة الفراولة ضمن باقة مع عناية خط البيكيني.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "150 مل"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 25,
+          "item": {
+            "@type": "Product",
+            "name": "زيت مساج تشيز كيك ومارشميلو",
+            "alternateName": "Hot Massage Oil · Cheesecake & Marshmallow",
+            "image": "/images/618189e1.jpg",
+            "description": "زيت مساج برائحة الحلويات مع هدايا خط البيكيني — تجربة عناية حسية فاخرة.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "150 مل"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 26,
+          "item": {
+            "@type": "Product",
+            "name": "صابونة الكبريت",
+            "alternateName": "Sulphur Soap",
+            "image": "/images/1de4c9a3.jpg",
+            "description": "صابون كبريت طبيعي لتنظيف عميق ومساعدة البشرة المعرّضة لحب الشباب.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "100 جم"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 27,
+          "item": {
+            "@type": "Product",
+            "name": "صابونة الأرز باللبن",
+            "alternateName": "Rice & Milk Soap",
+            "image": "/images/fb206c2b.jpg",
+            "description": "صابون أرز وحليب للتفتيح الفوري وإشراق البشرة بتركيبة طبيعية.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "100 جم"
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 28,
+          "item": {
+            "@type": "Product",
+            "name": "تشكيلة الجملة والعناية المتكاملة",
+            "alternateName": "Salon & Wholesale Assortment",
+            "image": "/images/ea30e1e3.png",
+            "description": "تشكيلة صالونات تشمل شامبو خميرة البيرة، فوت بالم، عبوات الجسم والمضخات. للاستفسار عن التوريد تواصلوا واتساب.",
+            "brand": {
+              "@id": "/#brand"
+            },
+            "additionalProperty": {
+              "@type": "PropertyValue",
+              "name": "size",
+              "value": "كراتين متنوعة"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "من هي بريانكا للتجميل؟",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "بريانكا للتجميل علامة مصرية للعناية بالبشرة والشعر، أسّسها إيهاب فارس وسُمّيت على اسم ابنته. تعتمد التصنيع على خلاصات الأعشاب والزيوت الطبيعية، وتُقدَّم منتجاتها للصالونات والمستهلك في المحافظات وللتصدير."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "هل الأسعار معروضة على الموقع؟",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "لا نضع أسعاراً ثابتة هنا لأن العروض والكميات تختلف بين الجملة والقطاعي. اطلبوا عرض السعر عبر واتساب أو الاتصال على 01272430202."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "كيف أتأكد أن المنتج أصلي؟",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "ابحثوا عن شعار بريانكا البارز على العبوة، وشارة الأصلي / Original، وعبارة احذروا التقليد. للطلبات الموثوقة تواصلوا عبر صفحة فيسبوك الرسمية priyanka.egypt أو الرقم المذكور في الموقع."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "هل المنتجات للاستخدام المنزلي والصالونات؟",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "نعم. عبوات الكيلو مناسبة للصالونات والحمام المغربي، والعبوات الأصغر للاستخدام الشخصي. نوضّح الحجم في بطاقة كل منتج."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "أين أطلب؟",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "اطلبوا عبر واتساب على 01272430202 أو من صفحة فيسبوك بريانكا مصر. حدّدوا اسم المنتج والكمية (قطاعي أو جملة)."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "HowTo",
+      "name": "طريقة طلب منتجات بريانكا للتجميل",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "text": "اختاروا المنتج من الكتالوج واحفظوا اسمه كما يظهر على البطاقة."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "text": "راسلونا واتساب باسم المنتج والكمية المطلوبة."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "text": "أكّدوا إن الطلب قطاعي أو جملة لتحصلوا على عرض السعر المناسب."
+        }
+      ]
+    }
+  ]
+}

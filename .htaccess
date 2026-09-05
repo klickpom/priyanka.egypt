@@ -1,0 +1,22 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  RewriteCond %{HTTP_HOST} ^www\.priyanka-eg\.shop$ [NC]
+  RewriteRule ^ https://priyanka-eg.shop%{REQUEST_URI} [L,R=301]
+
+  RewriteRule ^src/ - [F]
+  RewriteRule ^\.github/ - [F]
+  RewriteRule ^node_modules/ - [F]
+
+  RewriteRule ^dist/ - [L]
+  RewriteRule ^$ dist/index.html [L]
+  RewriteRule ^index\.html$ dist/index.html [L]
+  RewriteRule ^(about|products|faq|contact)\.html$ dist/$1.html [L]
+  RewriteRule ^assets/(.*)$ dist/assets/$1 [L]
+  RewriteRule ^images/(.*)$ dist/images/$1 [L]
+  RewriteRule ^(robots\.txt|sitemap\.xml|ai\.txt|llms\.txt|llms-full\.txt|schema\.jsonld)$ dist/$1 [L]
+</IfModule>
