@@ -13,7 +13,8 @@ Allow: /
 User-agent: PerplexityBot
 Allow: /
 
-Sitemap: https://priyanka-eg.shop/sitemap.xml
+Disallow: /admin.html
+Disallow: /api/
 
 # GEO
 # /llms.txt

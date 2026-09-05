@@ -1,13 +1,5 @@
 import "./styles/main.css";
-import {
-  products,
-  categories,
-  faqs,
-  waLink,
-  PHONE_DISPLAY,
-  PHONE_TEL,
-  FACEBOOK,
-} from "./data/products.js";
+import { bundledStore, foldSearch, makeWaLink, normalizeStore, productMatches, visibleProducts } from "./data/store.js";
 
 document.documentElement.classList.remove("no-js");
 
@@ -15,6 +7,20 @@ const page = document.body?.dataset.page || "home";
 const SPLASH_KEY = "priyanka-open-v7";
 const SPLASH_MS = 6400;
 const LAND_MS = 1680;
+const STORE_LOCAL_KEY = "priyanka-store-local";
+
+let store = bundledStore();
+let products = visibleProducts(store);
+let categories = store.categories;
+let faqs = store.faqs;
+
+function contact() {
+  return store.contact;
+}
+
+function waLink(text) {
+  return makeWaLink(contact().whatsapp, text);
+}
 
 function esc(value) {
   return String(value)
@@ -22,6 +28,68 @@ function esc(value) {
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;");
+}
+
+function applyStore(next) {
+  store = normalizeStore(next);
+  products = visibleProducts(store);
+  categories = store.categories;
+  faqs = store.faqs;
+}
+
+async function fetchJson(url) {
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error("fail");
+  return res.json();
+}
+
+async function loadStore() {
+  try {
+    const api = await fetchJson("/api/store.php");
+    if (api?.store) return normalizeStore(api.store);
+  } catch {
+    /* static host without PHP */
+  }
+  try {
+    return normalizeStore(await fetchJson("/data/store.live.json"));
+  } catch {
+    /* no live overlay */
+  }
+  try {
+    const local = localStorage.getItem(STORE_LOCAL_KEY);
+    if (local) return normalizeStore(JSON.parse(local));
+  } catch {
+    /* ignore */
+  }
+  try {
+    return normalizeStore(await fetchJson("/data/store.json"));
+  } catch {
+    return bundledStore();
+  }
+}
+
+function applyCopy() {
+  const copy = store.copy || {};
+  document.querySelectorAll("[data-copy]").forEach((el) => {
+    const value = copy[el.dataset.copy];
+    if (value) el.textContent = value;
+  });
+}
+
+function applyContact() {
+  const c = contact();
+  document.querySelectorAll("[data-phone]").forEach((el) => {
+    if (el.tagName === "A") el.setAttribute("href", `tel:${c.phoneTel}`);
+    const prefix = el.dataset.phonePrefix;
+    if (prefix) el.textContent = `${prefix} ${c.phoneDisplay}`;
+    else if (!el.hasAttribute("data-keep-label")) el.textContent = c.phoneDisplay;
+  });
+  document.querySelectorAll("[data-wa]").forEach((el) => {
+    if (el.tagName === "A") el.setAttribute("href", waLink());
+  });
+  document.querySelectorAll("[data-facebook]").forEach((el) => {
+    if (el.tagName === "A") el.setAttribute("href", c.facebook);
+  });
 }
 
 function logoPicture(extraClass = "", width = 148, height = 86) {
@@ -33,6 +101,9 @@ function logoPicture(extraClass = "", width = 148, height = 86) {
 }
 
 function injectChrome() {
+  const phone = contact().phoneDisplay;
+  const tel = contact().phoneTel;
+  const facebook = contact().facebook;
   const headerHost = document.querySelector("[data-chrome='header']");
   if (headerHost) {
     headerHost.outerHTML = `
@@ -50,19 +121,36 @@ function injectChrome() {
             <a href="/faq.html" data-nav-link="faq">الأسئلة</a>
             <a href="/contact.html" data-nav-link="contact">الطلب والتواصل</a>
             <div class="nav-cta">
+              <button class="btn btn-ghost search-open" type="button">بحث</button>
               <a class="btn btn-gold" href="${waLink()}" target="_blank" rel="noopener">واتساب</a>
-              <a class="btn btn-ghost" href="tel:${PHONE_TEL}">${PHONE_DISPLAY}</a>
+              <a class="btn btn-ghost" href="tel:${tel}">${phone}</a>
             </div>
           </nav>
           <div class="actions">
-            <a class="btn btn-ghost" href="tel:${PHONE_TEL}">${PHONE_DISPLAY}</a>
+            <button class="search-open search-icon-btn" type="button" aria-label="بحث في الموقع">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 20.49 21.49 19l-5.99-5zM9.5 14C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            </button>
+            <a class="btn btn-ghost" href="tel:${tel}">${phone}</a>
             <a class="btn btn-gold" href="${waLink()}" target="_blank" rel="noopener">واتساب</a>
           </div>
+          <button class="search-open search-icon-btn mobile-search" type="button" aria-label="بحث في الموقع">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 20.49 21.49 19l-5.99-5zM9.5 14C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          </button>
           <button class="nav-toggle" type="button" aria-expanded="false" aria-label="فتح القائمة">
             <span></span>
           </button>
         </div>
-      </header>`;
+      </header>
+      <div class="search-overlay" id="site-search" hidden>
+        <div class="search-panel" role="dialog" aria-modal="true" aria-labelledby="search-title">
+          <div class="search-bar">
+            <p id="search-title">بحث في منتجات بريانكا</p>
+            <input class="search-input" type="search" placeholder="اسم المنتج، المكونات، أو الإنجليزية..." autocomplete="off">
+            <button class="search-close" type="button" aria-label="إغلاق البحث">إغلاق</button>
+          </div>
+          <div class="search-results" data-search-results></div>
+        </div>
+      </div>`;
   }
 
   const footerHost = document.querySelector("[data-chrome='footer']");
@@ -72,8 +160,8 @@ function injectChrome() {
         <div class="container footer-grid">
           <div>
             <strong>بريانكا للتجميل</strong>
-            <p>علامة مصرية للعناية بالبشرة والشعر، من الطبيعة للبشرة. الطلب عبر واتساب أو فيسبوك — بدون أسعار ثابتة على الموقع.</p>
-            <p id="cite-footer">بريانكا للتجميل علامة مصرية أسّسها إيهاب فارس وسُمّيت على اسم ابنته. المستحضرات تعتمد على الأعشاب والزيوت الطبيعية للاستخدام المنزلي والصالونات. للتواصل: ${PHONE_DISPLAY} وصفحة فيسبوك priyanka.egypt. ليست مرتبطة ببريانكا شوبرا ولا بماكس فاكتور.</p>
+            <p data-copy="footerBlurb">${esc(store.copy.footerBlurb)}</p>
+            <p id="cite-footer">${esc(store.copy.aboutBody)}</p>
           </div>
           <div>
             <strong>تصفحوا</strong>
@@ -85,9 +173,9 @@ function injectChrome() {
           </div>
           <div>
             <strong>تواصل</strong>
-            <p><a href="tel:${PHONE_TEL}">${PHONE_DISPLAY}</a></p>
+            <p><a href="tel:${tel}">${phone}</a></p>
             <p><a href="${waLink()}" target="_blank" rel="noopener">واتساب</a></p>
-            <p><a href="${FACEBOOK}" target="_blank" rel="noopener">فيسبوك priyanka.egypt</a></p>
+            <p><a href="${esc(facebook)}" target="_blank" rel="noopener">فيسبوك priyanka.egypt</a></p>
           </div>
         </div>
         <div class="container copy">© بريانكا للتجميل — مصر. جميع الحقوق محفوظة.</div>
@@ -116,9 +204,23 @@ function injectChrome() {
             <h2 id="modal-title"></h2>
             <p data-modal-size></p>
             <p data-modal-desc></p>
+            <dl class="modal-facts">
+              <div data-modal-block="ingredients" hidden>
+                <dt>المكونات</dt>
+                <dd data-modal-ingredients></dd>
+              </div>
+              <div data-modal-block="usage" hidden>
+                <dt>طريقة الاستخدام</dt>
+                <dd data-modal-usage></dd>
+              </div>
+              <div data-modal-block="notes" hidden>
+                <dt>ملاحظات</dt>
+                <dd data-modal-notes></dd>
+              </div>
+            </dl>
             <div class="actions">
               <a class="btn btn-gold" data-modal-wa target="_blank" rel="noopener">اطلب عبر واتساب</a>
-              <a class="btn btn-ghost" href="tel:${PHONE_TEL}">اتصال</a>
+              <a class="btn btn-ghost" href="tel:${tel}">اتصال</a>
             </div>
           </div>
         </div>
@@ -455,10 +557,21 @@ function openModal(product) {
   img.src = product.img;
   img.alt = product.name;
   if (img.complete) img.classList.add("is-ready");
-  modal.querySelector("[data-modal-en]").textContent = product.en;
+  modal.querySelector("[data-modal-en]").textContent = product.en || "";
   modal.querySelector("#modal-title").textContent = product.name;
-  modal.querySelector("[data-modal-size]").textContent = product.size;
-  modal.querySelector("[data-modal-desc]").textContent = product.desc;
+  modal.querySelector("[data-modal-size]").textContent = product.size || "";
+  modal.querySelector("[data-modal-desc]").textContent = product.desc || "";
+  const fillBlock = (key, value) => {
+    const block = modal.querySelector(`[data-modal-block="${key}"]`);
+    const node = modal.querySelector(`[data-modal-${key}]`);
+    if (!block || !node) return;
+    const text = String(value || "").trim();
+    block.hidden = !text;
+    node.textContent = text;
+  };
+  fillBlock("ingredients", product.ingredients);
+  fillBlock("usage", product.usage);
+  fillBlock("notes", product.notes);
   const wa = modal.querySelector("[data-modal-wa]");
   wa.href = waLink(`مرحباً، أود الاستفسار عن ${product.name}`);
   modal.classList.add("is-open");
@@ -493,10 +606,19 @@ function renderProducts() {
   const params = new URLSearchParams(window.location.search);
   let current = featuredOnly ? "all" : params.get("cat") || "all";
   if (!categories.some((cat) => cat.id === current)) current = "all";
+  const catalogSearch = document.querySelector("[data-catalog-search]");
+  let query = featuredOnly ? "" : params.get("q") || "";
+  if (catalogSearch && query) catalogSearch.value = query;
 
   const source = featuredOnly ? products.filter((item) => item.featured) : products;
-  const paint = (cat, { reveal = motionStarted || page !== "home" } = {}) => {
-    const list = cat === "all" ? source : source.filter((item) => item.cat === cat);
+  const paint = (cat, text = query, { reveal = motionStarted || page !== "home" } = {}) => {
+    const list = (cat === "all" ? source : source.filter((item) => item.cat === cat)).filter((item) =>
+      productMatches(item, text)
+    );
+    if (!list.length) {
+      grid.innerHTML = `<p class="search-empty">لا توجد منتجات مطابقة. جرّبوا كلمة أخرى أو مجموعة مختلفة.</p>`;
+      return;
+    }
     grid.innerHTML = list.map((item, index) => cardHTML(item, index)).join("");
     bindProductCards(grid);
     if (reveal) revealCards(grid);
@@ -519,11 +641,27 @@ function renderProducts() {
       if (current === "all") url.searchParams.delete("cat");
       else url.searchParams.set("cat", current);
       history.replaceState({}, "", url);
-      paint(current);
+      paint(current, query);
     });
   }
 
-  paint(current);
+  if (catalogSearch && !featuredOnly) {
+    catalogSearch.addEventListener("input", () => {
+      query = catalogSearch.value;
+      const url = new URL(window.location.href);
+      if (foldSearch(query)) url.searchParams.set("q", query.trim());
+      else url.searchParams.delete("q");
+      history.replaceState({}, "", url);
+      paint(current, query);
+    });
+  }
+
+  paint(current, query);
+  const openId = params.get("id");
+  if (openId && !featuredOnly) {
+    const match = products.find((item) => item.id === openId);
+    if (match) openModal(match);
+  }
 }
 
 function renderFaqs() {
@@ -605,10 +743,90 @@ function setupParallax() {
   );
 }
 
-injectChrome();
-setupNav();
-setupHeaderScroll();
-setupModal();
-renderProducts();
-renderFaqs();
-runSplash();
+function setupSearch() {
+  const overlay = document.querySelector("#site-search");
+  const input = overlay?.querySelector(".search-input");
+  const results = overlay?.querySelector("[data-search-results]");
+  if (!overlay || !input || !results) return;
+
+  const paint = () => {
+    const q = input.value.trim();
+    if (!foldSearch(q)) {
+      results.innerHTML = `<p class="search-hint">ابحثوا بالعربية أو الإنجليزية: بطيخ، صابون، African، خميرة...</p>`;
+      return;
+    }
+    const hits = products.filter((item) => productMatches(item, q)).slice(0, 8);
+    if (!hits.length) {
+      results.innerHTML = `<p class="search-empty">لا توجد نتائج لـ «${esc(q)}».</p>`;
+      return;
+    }
+    results.innerHTML = hits
+      .map(
+        (item) => `
+        <a class="search-hit" href="/products.html?id=${esc(item.id)}&q=${encodeURIComponent(q)}">
+          <img src="${esc(item.img)}" alt="" width="56" height="56">
+          <span>
+            <strong>${esc(item.name)}</strong>
+            <small>${esc(item.en || "")} · ${esc(item.size || "")}</small>
+          </span>
+        </a>`
+      )
+      .join("");
+  };
+
+  const open = () => {
+    overlay.hidden = false;
+    document.body.classList.add("search-open-page");
+    input.focus();
+    paint();
+  };
+  const close = () => {
+    overlay.hidden = true;
+    document.body.classList.remove("search-open-page");
+  };
+
+  document.querySelectorAll(".search-open").forEach((btn) => btn.addEventListener("click", open));
+  overlay.querySelector(".search-close")?.addEventListener("click", close);
+  overlay.addEventListener("click", (event) => {
+    if (event.target === overlay) close();
+  });
+  input.addEventListener("input", paint);
+  results.addEventListener("click", (event) => {
+    const hit = event.target.closest(".search-hit");
+    if (!hit) return;
+    const id = new URL(hit.href, window.location.origin).searchParams.get("id");
+    const product = products.find((item) => item.id === id);
+    if (!product || !document.querySelector("#product-modal")) return;
+    if (page !== "home" && page !== "products") return;
+    event.preventDefault();
+    close();
+    openModal(product);
+  });
+  document.addEventListener("keydown", (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+      event.preventDefault();
+      open();
+    }
+    if (event.key === "/" && !event.ctrlKey && !event.metaKey && document.activeElement?.tagName !== "INPUT" && document.activeElement?.tagName !== "TEXTAREA") {
+      event.preventDefault();
+      open();
+    }
+    if (event.key === "Escape" && !overlay.hidden) close();
+  });
+}
+
+async function boot() {
+  applyStore(await loadStore());
+  injectChrome();
+  applyCopy();
+  applyContact();
+  setupNav();
+  setupHeaderScroll();
+  setupModal();
+  setupSearch();
+  renderProducts();
+  renderFaqs();
+  runSplash();
+}
+
+boot();

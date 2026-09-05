@@ -670,8 +670,9 @@
   ]
 }
 </script>
-  <script type="module" crossorigin src="/assets/main-CN-exV0E.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/main-C_U-LVSF.css">
+  <script type="module" crossorigin src="/assets/store-BBiuxmud.js"></script>
+  <script type="module" crossorigin src="/assets/main-BOr1BFiR.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/main-DikUGtb0.css">
 </head>
 <body data-page="products">
   <a class="skip-link" href="#main">تخطي إلى المحتوى</a>
@@ -705,11 +706,15 @@
             <a href="/index.html">الرئيسية</a><span aria-hidden="true">/</span>
             <span>المنتجات</span>
           </nav>
-        <p class="eyebrow">الكتالوج</p>
-        <h1>منتجات بريانكا للتجميل</h1>
-        <p class="lead">صور العبوات الحقيقية. اضغطوا البطاقة للتفاصيل ثم اطلبوا عبر واتساب باسم المنتج. بدون أسعار ثابتة على الموقع.</p>
+        <p class="eyebrow" data-copy="catalogEyebrow">الكتالوج</p>
+        <h1 data-copy="catalogTitle">منتجات بريانكا للتجميل</h1>
+        <p class="lead" data-copy="catalogLead">صور العبوات الحقيقية. اضغطوا البطاقة للتفاصيل ثم اطلبوا عبر واتساب باسم المنتج. بدون أسعار ثابتة على الموقع.</p>
       </section>
       <section class="container">
+        <form class="catalog-search" role="search" onsubmit="return false">
+          <label class="visually-hidden" for="catalog-q">بحث في الكتالوج</label>
+          <input id="catalog-q" data-catalog-search type="search" placeholder="ابحثوا عن منتج: بطيخ، صابون بلدي، خميرة البيرة...">
+        </form>
         <div class="filters" data-filters>
             <button class="filter-btn is-on" type="button" data-cat="all">الكل</button>
             <button class="filter-btn" type="button" data-cat="scrubs">مقشرات الجسم</button>

@@ -28,6 +28,9 @@ export const products = [
     size: "1 كجم",
     img: "/images/0cd14f51.jpg",
     desc: "مقشر جسم عميق التنظيف من خط Body Desserts بنكهة البطيخ. يقشر بلطف ويساعد البشرة على امتصاص العناية بعدها. عبوة 1 كجم — مناسب للاستخدام المنزلي والصالونات.",
+    ingredients: "خط Body Desserts بنكهة البطيخ.",
+    notes: "عبوة 1 كجم للمنزل والصالونات.",
+    tags: ["بطيخ", "watermelon", "body desserts"],
   },
   {
     id: "body-strawberry",
@@ -38,6 +41,8 @@ export const products = [
     size: "1 كجم",
     img: "/images/9f84cca5.jpg",
     desc: "مقشر جسم برائحة الفراولة من مجموعة الحلويات للجسم. تنظيف لطيف وملمس سبا فاخر في عبوة كيلو.",
+    ingredients: "خط Body Desserts برائحة الفراولة.",
+    tags: ["فراولة", "strawberry", "body desserts"],
   },
   {
     id: "body-apricot",
@@ -102,6 +107,9 @@ export const products = [
     size: "1 كجم",
     img: "/images/e43b3cea.jpg",
     desc: "صابون بلدي مغربي كلاسيكي للحمام البخاري. يُستخدم مع الكيس لتجديد البشرة قبل الزيوت والمرطبات.",
+    ingredients: "صابون بلدي مغربي كلاسيكي.",
+    notes: "يُستخدم مع الكيس في الحمام البخاري.",
+    tags: ["صابون بلدي", "black soap", "مغربي"],
   },
   {
     id: "black-soap-olive",
@@ -148,6 +156,8 @@ export const products = [
     size: "250 جم",
     img: "/images/01ac43a8.jpg",
     desc: "شامبو بالخلطة الأفريقية والزيوت الطبيعية. يساعد على ترطيب الشعر ومظهر الكثافة، مع علبة عرض احترافية.",
+    ingredients: "الخلطة الأفريقية والزيوت الطبيعية.",
+    tags: ["أفريقية", "african", "شامبو"],
   },
   {
     id: "african-magic",
@@ -167,6 +177,9 @@ export const products = [
     size: "250 جم",
     img: "/images/01417384.png",
     desc: "شامبو خميرة البيرة سريع المفعول لتكثيف الشعر. خاص بالتصدير — تأكدوا من شعار بريانكا البارز على العبوة.",
+    ingredients: "خميرة البيرة.",
+    notes: "تأكدوا من شعار بريانكا البارز على العبوة.",
+    tags: ["خميرة", "بيرة", "beer yeast"],
   },
   {
     id: "beer-cream",

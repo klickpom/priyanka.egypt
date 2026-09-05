@@ -16,6 +16,7 @@ export default defineConfig({
         about: resolve(__dirname, "about.html"),
         faq: resolve(__dirname, "faq.html"),
         contact: resolve(__dirname, "contact.html"),
+        admin: resolve(__dirname, "admin.html"),
       },
     },
   },

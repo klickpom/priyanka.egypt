@@ -2,3 +2,8 @@ node_modules
 .DS_Store
 *.log
 *.rar
+public/data/store.live.json
+public/data/auth.json
+public/images/uploads/*
+!public/images/uploads/.gitkeep
+!public/images/uploads/.htaccess
