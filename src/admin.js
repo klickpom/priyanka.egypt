@@ -2,6 +2,7 @@ import "./styles/admin.css";
 import { bundledStore, enrichProduct, normalizeStore } from "./data/store.js";
 
 const LOCAL_KEY = "priyanka-store-local";
+const SPLASH_KEY = "priyanka-admin-open-v1";
 const app = document.querySelector("#admin-app");
 
 let csrf = "";
@@ -12,6 +13,7 @@ let toast = "";
 let toastType = "";
 let phpReady = false;
 let listQuery = "";
+let splashTimer = 0;
 
 function esc(value) {
   return String(value ?? "")
@@ -133,14 +135,17 @@ function icon(name) {
 function renderGate(mode) {
   app.innerHTML = `
     <div class="gate">
+      <div class="gate-aura" aria-hidden="true"></div>
       <form class="gate-card" data-gate="${mode}">
+        <p class="gate-kicker">PRIYANKA · EGYPT</p>
         <img src="/images/logo.webp?v=3d3" alt="">
         <h1>${mode === "setup" ? "إنشاء لوحة التحكم" : "دخول المشرف"}</h1>
-        <p>${mode === "setup" ? "اختاروا كلمة مرور قوية مرة واحدة. لن تظهر في الموقع." : "عدّلوا المنتجات والنصوص ثم احفظوا."}</p>
+        <span class="gold-rule" aria-hidden="true"></span>
+        <p>${mode === "setup" ? "اختاروا كلمة مرور قوية مرة واحدة. لن تظهر في الموقع." : "من الطبيعة للبشرة — إدارة الكتالوج والنصوص."}</p>
         ${field("كلمة المرور", `<input type="password" name="password" minlength="8" required>`)}
         ${mode === "setup" ? field("تأكيد كلمة المرور", `<input type="password" name="confirm" minlength="8" required>`) : ""}
         <div class="form-actions" style="margin-top:18px">
-          <button class="btn btn-gold btn-wide" type="submit">${mode === "setup" ? "حفظ ودخول" : "دخول"}</button>
+          <button class="btn btn-gold btn-wide" type="submit">${mode === "setup" ? "حفظ ودخول" : "دخول اللوحة"}</button>
         </div>
         <p class="toast ${toastType}" style="margin-top:12px;text-align:center">${esc(toast)}</p>
       </form>
@@ -172,6 +177,43 @@ function nav(id, label, iconName) {
   return `<button type="button" data-view="${id}" class="side-link${on ? " is-on" : ""}">${icon(iconName)}<span>${label}</span></button>`;
 }
 
+function splashMarkup() {
+  return `
+    <div class="admin-splash" data-admin-splash>
+      <div class="admin-splash-lift" aria-hidden="true">
+        <div class="admin-splash-aurora"></div>
+        <div class="admin-splash-vignette"></div>
+        <div class="admin-splash-grain"></div>
+        <div class="admin-splash-frame"><span></span><span></span><span></span><span></span></div>
+      </div>
+      <div class="admin-splash-stage">
+        <p class="admin-splash-kicker">PRIYANKA · EGYPT</p>
+        <div class="admin-splash-mark">
+          <div class="admin-splash-ring"></div>
+          <div class="admin-splash-orbit"></div>
+          <img src="/images/logo.webp?v=3d3" alt="شعار بريانكا للتجميل">
+        </div>
+        <span class="gold-rule" aria-hidden="true"></span>
+        <h2>لوحة التحكم</h2>
+        <p class="admin-splash-tag">FROM NATURE FOR SKIN</p>
+        <p class="admin-splash-seal">الأصلي · Original · مصر</p>
+      </div>
+      <div class="admin-splash-progress" aria-hidden="true"></div>
+      <button class="admin-splash-skip" type="button" data-splash-skip>تخطي الافتتاحية</button>
+    </div>`;
+}
+
+function mountSplash() {
+  if (sessionStorage.getItem(SPLASH_KEY) === "1") return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    sessionStorage.setItem(SPLASH_KEY, "1");
+    return;
+  }
+  if (document.querySelector("[data-admin-splash]")) return;
+  document.body.insertAdjacentHTML("beforeend", splashMarkup());
+  bindSplash();
+}
+
 function shell(inner) {
   return `
     <div class="shell">
@@ -194,7 +236,7 @@ function shell(inner) {
           <button type="button" class="side-link logout" data-logout>${icon("logout")}<span>خروج</span></button>
         </nav>
       </aside>
-      <main class="main">
+      <main class="main${view === "home" ? " is-overview" : ""}">
         <div class="topbar">
           <div>
             <h1>${viewTitle()}</h1>
@@ -226,22 +268,95 @@ function viewTitle() {
 
 function homeView() {
   const active = store.products.filter((item) => item.active !== false).length;
+  const featured = store.products.filter((item) => item.featured).slice(0, 6);
+  const mosaic = (featured.length ? featured : store.products).slice(0, 3);
+  const mosaicCards = mosaic.length
+    ? mosaic
+    : [{ img: "/images/logo.webp?v=3d3", name: "بريانكا للتجميل" }];
+  const cats = store.categories.filter((cat) => cat.id !== "all").length;
+  const q = listQuery.trim().toLowerCase();
+  const hits = q
+    ? store.products.filter((item) => `${item.name} ${item.en} ${item.desc}`.toLowerCase().includes(q)).slice(0, 6)
+    : [];
   return `
-    <div class="grid-cards">
-      <div class="stat"><b>${store.products.length}</b><span>منتج في الكتالوج</span></div>
-      <div class="stat"><b>${active}</b><span>ظاهر للزوار</span></div>
-      <div class="stat"><b>${store.faqs.length}</b><span>سؤال شائع</span></div>
+    <section class="overview-hero">
+      <div class="overview-hero-glow" aria-hidden="true"></div>
+      <div class="overview-copy">
+        <p class="eyebrow">PRIYANKA · CONTROL ROOM</p>
+        <h2>من الطبيعة للبشرة</h2>
+        <span class="gold-rule" aria-hidden="true"></span>
+        <p class="lead">افتتاحية العلامة ثم غرفة التحكم: عدّلوا الاسم والصورة والمكونات، ثم احفظوا على الموقع. البحث يقرأ نفس البيانات التي يراها الزائر.</p>
+        <div class="overview-search">
+          <input data-home-q type="search" placeholder="ابحثوا عن منتج للتعديل: بطيخ، صابون، خميرة..." value="${esc(listQuery)}">
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn-gold" type="button" data-view="products">فتح الكتالوج</button>
+          <button class="btn btn-ghost-light" type="button" data-add>منتج جديد</button>
+          <button class="btn btn-ghost-light" type="button" data-replay-splash>إعادة الافتتاحية</button>
+        </div>
+        <p class="live-pill">${phpReady ? "متصل بالاستضافة" : "وضع محلي على هذا الجهاز"}</p>
+      </div>
+      <div class="overview-mosaic" aria-hidden="true">
+        ${mosaicCards
+          .map(
+            (item, index) =>
+              `<figure class="mosaic-cell${index === 0 ? " is-tall" : ""}"><img src="${esc(item.img)}" alt=""><figcaption>${esc(item.name)}</figcaption></figure>`
+          )
+          .join("")}
+      </div>
+    </section>
+    ${
+      q
+        ? `<section class="panel search-panel">
+            <div class="panel-head"><div><h2>نتائج البحث</h2><p>${hits.length} منتج مطابق</p></div></div>
+            <div class="list">${
+              hits.length
+                ? hits
+                    .map(
+                      (item) => `
+              <article class="row" data-open="${esc(item.id)}">
+                <img src="${esc(item.img)}" alt="">
+                <div><strong>${esc(item.name)}</strong><small>${esc(item.en)}</small></div>
+                <button class="btn btn-ghost" type="button">تعديل</button>
+              </article>`
+                    )
+                    .join("")
+                : `<p class="help">لا توجد نتائج. جرّبوا اسماً أقصر.</p>`
+            }</div>
+          </section>`
+        : ""
+    }
+    <div class="grid-cards four">
+      <div class="stat"><span class="stat-label">الكتالوج</span><b>${store.products.length}</b><span>منتج مسجّل</span></div>
+      <div class="stat"><span class="stat-label">ظاهر</span><b>${active}</b><span>يراه الزوار</span></div>
+      <div class="stat"><span class="stat-label">الأقسام</span><b>${cats}</b><span>مجموعة عناية</span></div>
+      <div class="stat"><span class="stat-label">الأسئلة</span><b>${store.faqs.length}</b><span>في صفحة FAQ</span></div>
     </div>
-    <div class="home-steps">
-      <article class="panel step">
-        <b>1. عدّلوا المنتج</b>
-        <p class="help">الاسم، الصورة، المكونات، طريقة الاستخدام، وكلمات البحث. البحث في الموقع يقرأ نفس هذه البيانات.</p>
-      </article>
-      <article class="panel step">
-        <b>2. احفظوا على الموقع</b>
-        <p class="help">بعد التعديل اضغطوا «حفظ على الموقع»، ثم خذوا نسخة JSON احتياطية. اللوحة لا تظهر في قائمة الزوار.</p>
-      </article>
+    <div class="quick-grid">
+      <button class="quick" type="button" data-view="products"><strong>المنتجات</strong><span>الاسم، الصورة، المكونات والاستخدام</span></button>
+      <button class="quick" type="button" data-view="copy"><strong>نصوص الموقع</strong><span>الهيرو، الكتالوج، عن العلامة</span></button>
+      <button class="quick" type="button" data-view="faqs"><strong>الأسئلة</strong><span>عدّلوا الإجابات كما يراها الزائر</span></button>
+      <button class="quick" type="button" data-view="contact"><strong>التواصل</strong><span>واتساب، الهاتف، فيسبوك</span></button>
     </div>
+    ${
+      featured.length
+        ? `<section class="panel">
+            <div class="panel-head"><div><h2>مختارات الرئيسية</h2><p>اضغطوا البطاقة لتعديل التفاصيل</p></div><button class="btn btn-ghost" type="button" data-view="products">كل المنتجات</button></div>
+            <div class="featured-strip">
+              ${featured
+                .map(
+                  (item) => `
+                <button class="featured-card" type="button" data-open="${esc(item.id)}">
+                  <img src="${esc(item.img)}" alt="">
+                  <strong>${esc(item.name)}</strong>
+                  <small>${esc(item.size || item.en)}</small>
+                </button>`
+                )
+                .join("")}
+            </div>
+          </section>`
+        : ""
+    }
     ${localStorage.getItem(LOCAL_KEY) ? `<p style="margin-top:16px"><button class="btn btn-ghost" type="button" data-restore-local>استعادة آخر تعديل من هذا الجهاز</button></p>` : ""}`;
 }
 
@@ -504,6 +619,7 @@ function render() {
                   : contactView();
   app.innerHTML = shell(inner);
   bindShell();
+  mountSplash();
 }
 
 function bindShell() {
@@ -553,6 +669,15 @@ function bindShell() {
     view = phpReady ? "gate-login" : "home";
     render();
   });
+  app.querySelector("[data-home-q]")?.addEventListener("input", (event) => {
+    listQuery = event.currentTarget.value;
+    render();
+    const input = app.querySelector("[data-home-q]");
+    if (input) {
+      input.focus();
+      input.setSelectionRange(listQuery.length, listQuery.length);
+    }
+  });
   app.querySelector("[data-plist-q]")?.addEventListener("input", (event) => {
     listQuery = event.currentTarget.value;
     render();
@@ -561,6 +686,13 @@ function bindShell() {
       input.focus();
       input.setSelectionRange(listQuery.length, listQuery.length);
     }
+  });
+  app.querySelector("[data-replay-splash]")?.addEventListener("click", () => {
+    window.clearTimeout(splashTimer);
+    sessionStorage.removeItem(SPLASH_KEY);
+    document.documentElement.classList.remove("admin-splash-lock");
+    document.querySelector("[data-admin-splash]")?.remove();
+    mountSplash();
   });
   app.querySelector("[data-add]")?.addEventListener("click", () => {
     const item = enrichProduct({
@@ -684,6 +816,22 @@ function bindShell() {
     store.contact.facebook = form.facebook.value.trim();
     await saveStore();
   });
+}
+
+function bindSplash() {
+  const splash = document.querySelector("[data-admin-splash]");
+  if (!splash) return;
+  document.documentElement.classList.add("admin-splash-lock");
+  const finish = () => {
+    if (splash.classList.contains("is-out")) return;
+    splash.classList.add("is-out");
+    sessionStorage.setItem(SPLASH_KEY, "1");
+    document.documentElement.classList.remove("admin-splash-lock");
+    window.setTimeout(() => splash.remove(), 780);
+  };
+  splash.querySelector("[data-splash-skip]")?.addEventListener("click", finish, { once: true });
+  window.clearTimeout(splashTimer);
+  splashTimer = window.setTimeout(finish, 3200);
 }
 
 async function hydrate() {
