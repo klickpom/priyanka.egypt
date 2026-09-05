@@ -12,8 +12,8 @@ import {
 document.documentElement.classList.remove("no-js");
 
 const page = document.body?.dataset.page || "home";
-const SPLASH_KEY = "priyanka-open-v4";
-const SPLASH_MS = 5200;
+const SPLASH_KEY = "priyanka-open-v5";
+const SPLASH_MS = 6400;
 
 function esc(value) {
   return String(value)
@@ -203,15 +203,15 @@ function drawSplashParticles(canvas) {
   if (!canvas) return () => {};
   const ctx = canvas.getContext("2d");
   if (!ctx) return () => {};
-  const dots = Array.from({ length: 72 }, () => ({
+  const dots = Array.from({ length: 56 }, () => ({
     x: Math.random(),
     y: Math.random(),
-    r: Math.random() * 2.1 + 0.35,
-    s: Math.random() * 0.00042 + 0.0001,
-    a: Math.random() * 0.5 + 0.1,
-    hue: Math.random() > 0.62 ? "rgba(232, 212, 138," : "rgba(209, 45, 140,",
+    r: Math.random() * 1.55 + 0.22,
+    vx: (Math.random() - 0.5) * 0.00022,
+    vy: -(Math.random() * 0.00032 + 0.00005),
+    a: Math.random() * 0.42 + 0.08,
+    gold: Math.random() > 0.32,
   }));
-  let frame = 0;
   let running = true;
 
   const resize = () => {
@@ -225,15 +225,20 @@ function drawSplashParticles(canvas) {
     if (!running) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     dots.forEach((dot) => {
-      dot.y -= dot.s;
-      if (dot.y < -0.02) dot.y = 1.02;
+      dot.x += dot.vx;
+      dot.y += dot.vy;
+      if (dot.y < -0.03) {
+        dot.y = 1.03;
+        dot.x = Math.random();
+      }
       ctx.beginPath();
-      ctx.fillStyle = `${dot.hue} ${dot.a})`;
+      ctx.fillStyle = dot.gold
+        ? `rgba(232, 212, 138, ${dot.a})`
+        : `rgba(209, 45, 140, ${dot.a * 0.85})`;
       ctx.arc(dot.x * canvas.width, dot.y * canvas.height, dot.r, 0, Math.PI * 2);
       ctx.fill();
     });
-    frame += 1;
-    if (frame < 560) requestAnimationFrame(tick);
+    requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);
   return () => {
@@ -246,7 +251,7 @@ function runSplash() {
   const splash = document.querySelector(".splash");
   const reduced = prefersReducedMotion();
 
-  if (page !== "home" || !splash || reduced) {
+  if (page !== "home" || !splash) {
     splash?.classList.add("is-done");
     splash?.setAttribute("aria-hidden", "true");
     revealSite();
@@ -255,6 +260,22 @@ function runSplash() {
   }
 
   const forceSplash = new URLSearchParams(location.search).has("splash");
+  if (forceSplash) document.documentElement.classList.add("splash-force");
+
+  if (reduced && !forceSplash) {
+    document.documentElement.classList.add("splash-lock");
+    splash.classList.add("is-lite");
+    revealSite();
+    window.setTimeout(() => {
+      sessionStorage.setItem(SPLASH_KEY, "1");
+      landBrand();
+      splash.classList.add("is-done");
+      splash.setAttribute("aria-hidden", "true");
+      unlockSplash();
+    }, 1600);
+    return;
+  }
+
   if (!forceSplash && sessionStorage.getItem(SPLASH_KEY)) {
     splash.classList.add("is-done");
     splash.setAttribute("aria-hidden", "true");
