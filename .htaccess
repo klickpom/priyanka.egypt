@@ -15,8 +15,10 @@
   RewriteRule ^dist/ - [L]
   RewriteRule ^$ dist/index.html [L]
   RewriteRule ^index\.html$ dist/index.html [L]
-  RewriteRule ^(about|products|faq|contact)\.html$ dist/$1.html [L]
+  RewriteRule ^(about|products|faq|contact|admin)\.html$ dist/$1.html [L]
   RewriteRule ^assets/(.*)$ dist/assets/$1 [L]
   RewriteRule ^images/(.*)$ dist/images/$1 [L]
+  RewriteRule ^api/(.*)$ dist/api/$1 [L]
+  RewriteRule ^data/(.*)$ dist/data/$1 [L]
   RewriteRule ^(robots\.txt|sitemap\.xml|ai\.txt|llms\.txt|llms-full\.txt|schema\.jsonld)$ dist/$1 [L]
 </IfModule>
