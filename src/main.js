@@ -12,7 +12,7 @@ import {
 document.documentElement.classList.remove("no-js");
 
 const page = document.body?.dataset.page || "home";
-const SPLASH_KEY = "priyanka-open-v5";
+const SPLASH_KEY = "priyanka-open-v6";
 const SPLASH_MS = 6400;
 
 function esc(value) {
@@ -23,6 +23,14 @@ function esc(value) {
     .replaceAll('"', "&quot;");
 }
 
+function logoPicture(extraClass = "", width = 148, height = 86) {
+  const cls = extraClass ? ` class="${extraClass}"` : "";
+  return `<picture>
+            <source type="image/webp" srcset="/images/logo.webp?v=3d2">
+            <img${cls} src="/images/logo.png?v=3d2" alt="شعار بريانكا للتجميل" width="${width}" height="${height}">
+          </picture>`;
+}
+
 function injectChrome() {
   const headerHost = document.querySelector("[data-chrome='header']");
   if (headerHost) {
@@ -31,7 +39,7 @@ function injectChrome() {
         <div class="scroll-progress" aria-hidden="true"></div>
         <div class="header-inner">
           <a class="brand" href="/index.html">
-            <img src="/images/logo.png" alt="شعار بريانكا للتجميل" width="86" height="56">
+            ${logoPicture()}
             <span>بريانكا للتجميل<small>PRIYANKA · EGYPT</small></span>
           </a>
           <nav class="nav" data-nav aria-label="التنقل الرئيسي">
@@ -40,6 +48,10 @@ function injectChrome() {
             <a href="/about.html" data-nav-link="about">عن العلامة</a>
             <a href="/faq.html" data-nav-link="faq">الأسئلة</a>
             <a href="/contact.html" data-nav-link="contact">الطلب والتواصل</a>
+            <div class="nav-cta">
+              <a class="btn btn-gold" href="${waLink()}" target="_blank" rel="noopener">واتساب</a>
+              <a class="btn btn-ghost" href="tel:${PHONE_TEL}">${PHONE_DISPLAY}</a>
+            </div>
           </nav>
           <div class="actions">
             <a class="btn btn-ghost" href="tel:${PHONE_TEL}">${PHONE_DISPLAY}</a>
@@ -121,9 +133,15 @@ function setupNav() {
   const toggle = document.querySelector(".nav-toggle");
   const nav = document.querySelector("[data-nav]");
   if (!toggle || !nav) return;
-  toggle.addEventListener("click", () => {
-    const open = nav.classList.toggle("is-open");
+  const setOpen = (open) => {
+    nav.classList.toggle("is-open", open);
     toggle.setAttribute("aria-expanded", String(open));
+    toggle.setAttribute("aria-label", open ? "إغلاق القائمة" : "فتح القائمة");
+    document.body.classList.toggle("nav-open", open);
+  };
+  toggle.addEventListener("click", () => setOpen(!nav.classList.contains("is-open")));
+  nav.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => setOpen(false));
   });
 }
 
