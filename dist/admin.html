@@ -15,6 +15,11 @@
   <link rel="stylesheet" crossorigin href="/assets/admin-DL5CnlGO.css">
 </head>
 <body>
+  <script>
+    if (!document.querySelector('script[src*="/assets/admin"]')) {
+      location.replace("/dist/admin.html");
+    }
+  </script>
   <div id="admin-app"></div>
 </body>
 </html>
