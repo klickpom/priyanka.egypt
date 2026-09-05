@@ -502,7 +502,8 @@ function setupParallax() {
   const visual = document.querySelector(".hero-visual");
   const hero = document.querySelector(".hero");
   if (!visual || !hero) return;
-  const badges = hero.querySelectorAll(".float-badge");
+  const chips = hero.querySelectorAll(".hero-chip");
+  const cells = visual.querySelectorAll(".mosaic-cell");
 
   let ticking = false;
   const update = () => {
@@ -510,11 +511,19 @@ function setupParallax() {
     const y = window.scrollY;
     const limit = Math.max(1, hero.offsetHeight);
     const p = Math.min(1, y / limit);
-    visual.style.transform = `translate3d(0, ${Math.min(y, limit) * 0.18}px, 0)`;
-    hero.style.setProperty("--hero-fade", String(Math.max(0.12, 1 - p * 0.72)));
-    badges.forEach((badge, index) => {
-      badge.style.transform = `translate3d(0, ${y * (0.1 + index * 0.05)}px, 0)`;
-      badge.style.opacity = String(Math.max(0, 1 - p * 1.35));
+    visual.style.transform = `translate3d(0, ${Math.min(y, limit) * 0.14}px, 0)`;
+    hero.style.setProperty("--hero-fade", String(Math.max(0.18, 1 - p * 0.7)));
+    chips.forEach((chip, index) => {
+      if (y < 10) {
+        chip.style.transform = "";
+        chip.style.opacity = "";
+        return;
+      }
+      chip.style.transform = `translate3d(0, ${y * (0.08 + index * 0.04)}px, 0)`;
+      chip.style.opacity = String(Math.max(0, 1 - p * 1.4));
+    });
+    cells.forEach((cell, index) => {
+      cell.style.translate = y < 10 ? "" : `0 ${y * (0.04 + index * 0.02)}px`;
     });
   };
 
