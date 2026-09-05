@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+Disallow: /admin.html
+Disallow: /api/
+
+# GEO
+# /llms.txt
+# /llms-full.txt
+# /ai.txt

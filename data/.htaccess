@@ -1,0 +1,8 @@
+<IfModule mod_authz_core.c>
+  <Files "auth.json">
+    Require all denied
+  </Files>
+  <Files "store.live.json">
+    Require all denied
+  </Files>
+</IfModule>

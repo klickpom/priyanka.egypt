@@ -1,0 +1,8 @@
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
+/llms-full.txt
+  Content-Type: text/plain; charset=utf-8
+/ai.txt
+  Content-Type: text/plain; charset=utf-8
+/schema.jsonld
+  Content-Type: application/ld+json; charset=utf-8
