@@ -112,6 +112,24 @@ function productById(id) {
   return store.products.find((item) => item.id === id);
 }
 
+function field(label, inner) {
+  return `<label class="field"><span>${label}</span>${inner}</label>`;
+}
+
+function icon(name) {
+  const paths = {
+    home: "M4 10.5 12 3l8 7.5V20a1 1 0 0 1-1 1h-5v-7H10v7H5a1 1 0 0 1-1-1z",
+    products: "M4 7h16v12H4zm3-3h10l1 3H6z",
+    categories: "M4 6h7v7H4zm9 0h7v7h-7zM4 15h7v5H4zm9 0h7v5h-7z",
+    faqs: "M12 3a9 9 0 1 0 9 9 9 9 0 0 0-9-9zm.8 13h-1.6v-1.7h1.6zm1.7-4.8c-.3.5-.7.8-1.2 1.1-.4.3-.5.5-.5 1h-1.6c0-1 .4-1.6 1-2 .5-.4.8-.7 1-1.1a1.6 1.6 0 0 0-1.5-2.4 1.8 1.8 0 0 0-1.8 1.5l-1.5-.4A3.4 3.4 0 0 1 12 6.8a3.2 3.2 0 0 1 3.3 3.3c0 .7-.3 1.3-.8 2.1z",
+    copy: "M6 5h9v14H6zm3-2h9v14h-2V5H9z",
+    contact: "M6.5 4h11A1.5 1.5 0 0 1 19 5.5v13l-7-3.2-7 3.2v-13A1.5 1.5 0 0 1 6.5 4z",
+    settings: "M12 8.5A3.5 3.5 0 1 0 15.5 12 3.5 3.5 0 0 0 12 8.5zM4 13l2 .6a6.6 6.6 0 0 0 .5 1.3L5.3 17 7 18.7l1.9-1.2a6.6 6.6 0 0 0 1.3.5L11 20h2l.6-2a6.6 6.6 0 0 0 1.3-.5L17 18.7 18.7 17l-1.2-1.9a6.6 6.6 0 0 0 .5-1.3L20 13v-2l-2-.6a6.6 6.6 0 0 0-.5-1.3L18.7 7 17 5.3l-1.9 1.2a6.6 6.6 0 0 0-1.3-.5L13 4h-2l-.6 2a6.6 6.6 0 0 0-1.3.5L7 5.3 5.3 7l1.2 1.9a6.6 6.6 0 0 0-.5 1.3L4 11z",
+    logout: "M10 5H6v14h4m3-4 4-4-4-4m4 4H9",
+  };
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${paths[name]}"/></svg>`;
+}
+
 function renderGate(mode) {
   app.innerHTML = `
     <div class="gate">
@@ -119,10 +137,12 @@ function renderGate(mode) {
         <img src="/images/logo.webp?v=3d3" alt="">
         <h1>${mode === "setup" ? "إنشاء لوحة التحكم" : "دخول المشرف"}</h1>
         <p>${mode === "setup" ? "اختاروا كلمة مرور قوية مرة واحدة. لن تظهر في الموقع." : "عدّلوا المنتجات والنصوص ثم احفظوا."}</p>
-        <label>كلمة المرور<input type="password" name="password" minlength="8" required></label>
-        ${mode === "setup" ? `<label>تأكيد كلمة المرور<input type="password" name="confirm" minlength="8" required></label>` : ""}
-        <button class="btn btn-gold" type="submit" style="width:100%">${mode === "setup" ? "حفظ ودخول" : "دخول"}</button>
-        <p class="toast ${toastType}">${esc(toast)}</p>
+        ${field("كلمة المرور", `<input type="password" name="password" minlength="8" required>`)}
+        ${mode === "setup" ? field("تأكيد كلمة المرور", `<input type="password" name="confirm" minlength="8" required>`) : ""}
+        <div class="form-actions" style="margin-top:18px">
+          <button class="btn btn-gold btn-wide" type="submit">${mode === "setup" ? "حفظ ودخول" : "دخول"}</button>
+        </div>
+        <p class="toast ${toastType}" style="margin-top:12px;text-align:center">${esc(toast)}</p>
       </form>
     </div>`;
   app.querySelector("form").addEventListener("submit", async (event) => {
@@ -147,32 +167,41 @@ function renderGate(mode) {
   });
 }
 
-function nav(id, label) {
-  return `<button type="button" data-view="${id}" class="${view === id || (view === "edit" && id === "products") ? "is-on" : ""}">${label}</button>`;
+function nav(id, label, iconName) {
+  const on = view === id || (view === "edit" && id === "products");
+  return `<button type="button" data-view="${id}" class="side-link${on ? " is-on" : ""}">${icon(iconName)}<span>${label}</span></button>`;
 }
 
 function shell(inner) {
   return `
     <div class="shell">
       <aside class="side">
-        <strong>بريانكا · لوحة التحكم</strong>
-        ${nav("home", "نظرة عامة")}
-        ${nav("products", "المنتجات")}
-        ${nav("categories", "الأقسام")}
-        ${nav("faqs", "الأسئلة")}
-        ${nav("copy", "نصوص الموقع")}
-        ${nav("contact", "التواصل")}
-        ${nav("settings", "الإعدادات")}
-        <button type="button" data-logout>خروج</button>
+        <div class="brand-block">
+          <img src="/images/logo.webp?v=3d3" alt="">
+          <div>
+            <strong>بريانكا</strong>
+            <small>ADMIN</small>
+          </div>
+        </div>
+        <nav class="side-nav" aria-label="أقسام اللوحة">
+          ${nav("home", "نظرة عامة", "home")}
+          ${nav("products", "المنتجات", "products")}
+          ${nav("categories", "الأقسام", "categories")}
+          ${nav("faqs", "الأسئلة", "faqs")}
+          ${nav("copy", "نصوص الموقع", "copy")}
+          ${nav("contact", "التواصل", "contact")}
+          ${nav("settings", "الإعدادات", "settings")}
+          <button type="button" class="side-link logout" data-logout>${icon("logout")}<span>خروج</span></button>
+        </nav>
       </aside>
       <main class="main">
         <div class="topbar">
           <div>
-            <h1 style="margin:0">${viewTitle()}</h1>
-            <p class="toast ${toastType}">${esc(toast || (phpReady ? "الحفظ يصل إلى الموقع مباشرة." : "وضع محلي: احفظوا نسخة احتياطية JSON."))}</p>
+            <h1>${viewTitle()}</h1>
+            <p class="kicker toast ${toastType}">${esc(toast || (phpReady ? "الحفظ يصل إلى الموقع مباشرة بعد «حفظ على الموقع»." : "وضع محلي: احفظوا نسخة احتياطية JSON."))}</p>
           </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <label class="btn btn-ghost" style="cursor:pointer">استعادة JSON<input type="file" data-restore accept="application/json" hidden></label>
+          <div class="top-actions">
+            <label class="btn btn-ghost">استعادة JSON<input type="file" data-restore accept="application/json" hidden></label>
             <button class="btn btn-ghost" type="button" data-backup>نسخة احتياطية</button>
             <button class="btn btn-purple" type="button" data-save>حفظ على الموقع</button>
           </div>
@@ -203,9 +232,17 @@ function homeView() {
       <div class="stat"><b>${active}</b><span>ظاهر للزوار</span></div>
       <div class="stat"><b>${store.faqs.length}</b><span>سؤال شائع</span></div>
     </div>
-    <p>من هنا تعدّلون الاسم، الوصف، المكونات، طريقة الاستخدام، الصورة، والأقسام. البحث في الموقع يقرأ نفس هذه البيانات.</p>
-    <p>رابط اللوحة: <strong>/admin.html</strong> — لا يظهر في قائمة الزوار. بعد كل حفظ اضغطوا «حفظ على الموقع» ثم راجعوا الصفحة الرئيسية.</p>
-    ${localStorage.getItem(LOCAL_KEY) ? `<p><button class="btn btn-ghost" type="button" data-restore-local>استعادة آخر تعديل من هذا الجهاز</button></p>` : ""}`;
+    <div class="home-steps">
+      <article class="panel step">
+        <b>1. عدّلوا المنتج</b>
+        <p class="help">الاسم، الصورة، المكونات، طريقة الاستخدام، وكلمات البحث. البحث في الموقع يقرأ نفس هذه البيانات.</p>
+      </article>
+      <article class="panel step">
+        <b>2. احفظوا على الموقع</b>
+        <p class="help">بعد التعديل اضغطوا «حفظ على الموقع»، ثم خذوا نسخة JSON احتياطية. اللوحة لا تظهر في قائمة الزوار.</p>
+      </article>
+    </div>
+    ${localStorage.getItem(LOCAL_KEY) ? `<p style="margin-top:16px"><button class="btn btn-ghost" type="button" data-restore-local>استعادة آخر تعديل من هذا الجهاز</button></p>` : ""}`;
 }
 
 function productsView() {
@@ -216,7 +253,7 @@ function productsView() {
   });
   return `
     <div class="toolbar">
-      <input data-plist-q placeholder="بحث داخل المنتجات" value="${esc(listQuery)}">
+      <input data-plist-q placeholder="بحث بالاسم أو الوصف..." value="${esc(listQuery)}">
       <button class="btn btn-gold" type="button" data-add>منتج جديد</button>
     </div>
     <div class="list">
@@ -226,8 +263,8 @@ function productsView() {
         <article class="row" data-open="${esc(item.id)}">
           <img src="${esc(item.img)}" alt="">
           <div>
-            <strong>${esc(item.name)}</strong>
-            <small>${esc(item.en)} · ${esc(item.size)} · ${item.active === false ? "مخفي" : "ظاهر"}</small>
+            <strong>${esc(item.name)} ${item.featured ? `<span class="pill">مميز</span>` : ""} ${item.active === false ? `<span class="pill off">مخفي</span>` : ""}</strong>
+            <small>${esc(item.en)} · ${esc(item.size || "بدون حجم")}</small>
           </div>
           <button class="btn btn-ghost" type="button">تعديل</button>
         </article>`
@@ -240,32 +277,50 @@ function editorView() {
   const item = enrichProduct(productById(editingId) || {});
   return `
     <div class="editor">
-      <form data-editor>
-        <label>الاسم بالعربية<input name="name" value="${esc(item.name)}" required></label>
-        <label>الاسم بالإنجليزية<input name="en" value="${esc(item.en)}"></label>
-        <label>القسم
-          <select name="cat">
-            ${store.categories
-              .filter((cat) => cat.id !== "all")
-              .map((cat) => `<option value="${esc(cat.id)}" ${cat.id === item.cat ? "selected" : ""}>${esc(cat.name)}</option>`)
-              .join("")}
-          </select>
-        </label>
-        <label>الحجم / العبوة<input name="size" value="${esc(item.size)}"></label>
-        <label>رابط الصورة<input name="img" value="${esc(item.img)}"></label>
-        <label>رفع صورة جديدة<input type="file" name="file" accept="image/jpeg,image/png,image/webp"></label>
-        <label>وصف المنتج للزائر<textarea name="desc" rows="4">${esc(item.desc)}</textarea></label>
-        <label>المكونات<textarea name="ingredients" rows="3">${esc(item.ingredients)}</textarea></label>
-        <label>طريقة الاستخدام<textarea name="usage" rows="3">${esc(item.usage)}</textarea></label>
-        <label>ملاحظات<textarea name="notes" rows="2">${esc(item.notes)}</textarea></label>
-        <label>كلمات بحث (افصلوا بفاصلة)<input name="tags" value="${esc((item.tags || []).join("، "))}"></label>
-        <label class="check"><input type="checkbox" name="featured" ${item.featured ? "checked" : ""}> منتج مميز في الرئيسية</label>
-        <label class="check"><input type="checkbox" name="active" ${item.active !== false ? "checked" : ""}> ظاهر في الموقع</label>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-          <button class="btn btn-purple" type="submit">حفظ المنتج</button>
-          <button class="btn btn-ghost" type="button" data-view="products">رجوع</button>
-          <button class="btn btn-danger" type="button" data-delete>حذف</button>
-        </div>
+      <form class="editor-form" data-editor>
+        <section class="panel">
+          <div class="panel-head"><div><h2>بيانات المنتج</h2><p>كما تظهر للزائر في البطاقة والبحث</p></div></div>
+          <div class="fields-grid two">
+            ${field("الاسم بالعربية", `<input name="name" value="${esc(item.name)}" required>`)}
+            ${field("الاسم بالإنجليزية", `<input name="en" value="${esc(item.en)}">`)}
+            ${field(
+              "القسم",
+              `<select name="cat">${store.categories
+                .filter((cat) => cat.id !== "all")
+                .map((cat) => `<option value="${esc(cat.id)}" ${cat.id === item.cat ? "selected" : ""}>${esc(cat.name)}</option>`)
+                .join("")}</select>`
+            )}
+            ${field("الحجم / العبوة", `<input name="size" value="${esc(item.size)}">`)}
+          </div>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><div><h2>الصورة</h2><p>JPG أو PNG أو WebP حتى 4 ميجا</p></div></div>
+          <div class="fields-grid two">
+            ${field("رابط الصورة", `<input name="img" value="${esc(item.img)}">`)}
+            ${field("رفع صورة جديدة", `<input type="file" name="file" accept="image/jpeg,image/png,image/webp">`)}
+          </div>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><div><h2>التفاصيل</h2><p>تظهر في نافذة المنتج على الموقع</p></div></div>
+          <div class="fields-grid">
+            ${field("وصف المنتج للزائر", `<textarea name="desc" rows="4">${esc(item.desc)}</textarea>`)}
+            ${field("المكونات", `<textarea name="ingredients" rows="3">${esc(item.ingredients)}</textarea>`)}
+            ${field("طريقة الاستخدام", `<textarea name="usage" rows="3">${esc(item.usage)}</textarea>`)}
+            ${field("ملاحظات", `<textarea name="notes" rows="2">${esc(item.notes)}</textarea>`)}
+            ${field("كلمات بحث (افصلوا بفاصلة)", `<input name="tags" value="${esc((item.tags || []).join("، "))}">`)}
+          </div>
+        </section>
+        <section class="panel">
+          <div class="checks">
+            <label class="check"><input type="checkbox" name="featured" ${item.featured ? "checked" : ""}> منتج مميز في الرئيسية</label>
+            <label class="check"><input type="checkbox" name="active" ${item.active !== false ? "checked" : ""}> ظاهر في الموقع</label>
+          </div>
+          <div class="form-actions" style="margin-top:14px">
+            <button class="btn btn-purple" type="submit">حفظ المنتج</button>
+            <button class="btn btn-ghost" type="button" data-view="products">رجوع للكتالوج</button>
+            <button class="btn btn-danger" type="button" data-delete>حذف المنتج</button>
+          </div>
+        </section>
       </form>
       <aside class="preview">
         <img src="${esc(item.img)}" alt="">
@@ -279,16 +334,21 @@ function editorView() {
 
 function categoriesView() {
   return `
-    <button class="btn btn-gold" type="button" data-add-cat>قسم جديد</button>
-    <div style="margin-top:16px">
+    <div class="toolbar">
+      <p class="help" style="flex:1;margin:0">المعرّف بالإنجليزية للروابط، والاسم بالعربية كما يظهر للزائر.</p>
+      <button class="btn btn-gold" type="button" data-add-cat>قسم جديد</button>
+    </div>
+    <div class="stack">
       ${store.categories
         .map(
           (cat, index) => `
-        <div class="cat-item" data-cat-i="${index}">
-          <label>المعرّف<input name="id" value="${esc(cat.id)}" ${cat.id === "all" ? "readonly" : ""}></label>
-          <label>الاسم<input name="name" value="${esc(cat.name)}"></label>
-          ${cat.id === "all" ? "" : `<button class="btn btn-danger" type="button" data-del-cat="${index}">حذف</button>`}
-        </div>`
+        <article class="panel cat-item" data-cat-i="${index}">
+          <div class="fields-grid two">
+            ${field("المعرّف", `<input name="id" value="${esc(cat.id)}" ${cat.id === "all" ? "readonly" : ""}>`)}
+            ${field("الاسم الظاهر", `<input name="name" value="${esc(cat.name)}">`)}
+          </div>
+          ${cat.id === "all" ? "" : `<div class="item-actions"><button class="btn btn-danger" type="button" data-del-cat="${index}">حذف القسم</button></div>`}
+        </article>`
         )
         .join("")}
     </div>`;
@@ -296,79 +356,129 @@ function categoriesView() {
 
 function faqsView() {
   return `
-    <button class="btn btn-gold" type="button" data-add-faq>سؤال جديد</button>
-    <div style="margin-top:16px">
+    <div class="toolbar">
+      <p class="help" style="flex:1;margin:0">كل بطاقة سؤال واحد. احفظوا بعد التعديل من الزر أعلى الصفحة.</p>
+      <button class="btn btn-gold" type="button" data-add-faq>سؤال جديد</button>
+    </div>
+    <div class="stack">
       ${store.faqs
         .map(
           (item, index) => `
-        <div class="faq-item" data-faq-i="${index}">
-          <label>السؤال<input name="q" value="${esc(item.q)}"></label>
-          <label>الجواب<textarea name="a" rows="3">${esc(item.a)}</textarea></label>
-          <button class="btn btn-danger" type="button" data-del-faq="${index}">حذف</button>
-        </div>`
+        <article class="panel faq-item" data-faq-i="${index}">
+          <div class="fields-grid">
+            ${field("السؤال", `<input name="q" value="${esc(item.q)}">`)}
+            ${field("الجواب", `<textarea name="a" rows="4">${esc(item.a)}</textarea>`)}
+          </div>
+          <div class="item-actions"><button class="btn btn-danger" type="button" data-del-faq="${index}">حذف السؤال</button></div>
+        </article>`
         )
         .join("")}
     </div>`;
 }
 
 function copyView() {
-  const fields = [
-    ["heroEyebrow", "سطر الهيرو الصغير"],
-    ["heroTitle", "عنوان الهيرو"],
-    ["heroAccent", "السطر الملوّن"],
-    ["heroLead", "وصف الهيرو"],
-    ["collectionsEyebrow", "سطر المجموعات"],
-    ["collectionsTitle", "عنوان المجموعات"],
-    ["collectionsLead", "وصف المجموعات"],
-    ["featuredEyebrow", "سطر المختارات"],
-    ["featuredTitle", "عنوان المختارات"],
-    ["catalogEyebrow", "سطر الكتالوج"],
-    ["catalogTitle", "عنوان الكتالوج"],
-    ["catalogLead", "وصف الكتالوج"],
-    ["aboutEyebrow", "سطر صفحة عن العلامة"],
-    ["aboutTitle", "عنوان صفحة عن العلامة"],
-    ["aboutQuote", "اقتباس عن العلامة"],
-    ["aboutBody", "نص عن العلامة"],
-    ["aboutLines", "سطور الخطوط"],
-    ["footerBlurb", "نص التذييل"],
+  const groups = [
+    {
+      title: "الصفحة الرئيسية · الهيرو",
+      hint: "العنوان الكبير أعلى الموقع",
+      fields: [
+        ["heroEyebrow", "السطر الصغير", 2],
+        ["heroTitle", "العنوان", 2],
+        ["heroAccent", "السطر الملوّن", 2],
+        ["heroLead", "الوصف", 4],
+      ],
+    },
+    {
+      title: "المجموعات والمختارات",
+      hint: "أقسام خطوط العناية والمنتجات المميزة",
+      fields: [
+        ["collectionsEyebrow", "سطر المجموعات", 2],
+        ["collectionsTitle", "عنوان المجموعات", 2],
+        ["collectionsLead", "وصف المجموعات", 3],
+        ["featuredEyebrow", "سطر المختارات", 2],
+        ["featuredTitle", "عنوان المختارات", 2],
+      ],
+    },
+    {
+      title: "الكتالوج",
+      hint: "صفحة المنتجات",
+      fields: [
+        ["catalogEyebrow", "السطر الصغير", 2],
+        ["catalogTitle", "العنوان", 2],
+        ["catalogLead", "الوصف", 3],
+      ],
+    },
+    {
+      title: "عن العلامة والتذييل",
+      hint: "صفحة القصة ونص أسفل الموقع",
+      fields: [
+        ["aboutEyebrow", "سطر صفحة عن العلامة", 2],
+        ["aboutTitle", "عنوان الصفحة", 2],
+        ["aboutQuote", "الاقتباس", 2],
+        ["aboutBody", "نص عن العلامة", 5],
+        ["aboutLines", "سطور الخطوط", 4],
+        ["footerBlurb", "نص التذييل", 3],
+      ],
+    },
   ];
   return `
-    <form data-copy>
-      ${fields
+    <form class="copy-form" data-copy>
+      ${groups
         .map(
-          ([key, label]) =>
-            `<label>${label}<textarea name="${key}" rows="${key.includes("Lead") || key.includes("Body") || key.includes("Lines") ? 4 : 2}">${esc(store.copy[key] || "")}</textarea></label>`
+          (group) => `
+        <section class="panel">
+          <div class="panel-head"><div><h2>${group.title}</h2><p>${group.hint}</p></div></div>
+          <div class="fields-grid">${group.fields
+            .map(([key, label, rows]) => field(label, `<textarea name="${key}" rows="${rows}">${esc(store.copy[key] || "")}</textarea>`))
+            .join("")}</div>
+        </section>`
         )
         .join("")}
-      <button class="btn btn-purple" type="submit">حفظ النصوص</button>
+      <div class="form-actions">
+        <button class="btn btn-purple" type="submit">حفظ النصوص</button>
+      </div>
     </form>`;
 }
 
 function contactView() {
   const c = store.contact;
   return `
-    <form data-contact>
-      <label>رقم العرض<input name="phoneDisplay" value="${esc(c.phoneDisplay)}"></label>
-      <label>رقم الاتصال الدولي<input name="phoneTel" value="${esc(c.phoneTel)}"></label>
-      <label>واتساب بدون +<input name="whatsapp" value="${esc(c.whatsapp)}"></label>
-      <label>رابط فيسبوك<input name="facebook" value="${esc(c.facebook)}"></label>
-      <button class="btn btn-purple" type="submit">حفظ التواصل</button>
+    <form class="contact-form" data-contact>
+      <section class="panel">
+        <div class="panel-head"><div><h2>أرقام وروابط التواصل</h2><p>تظهر في الهيدر، التذييل، وصفحة الطلب</p></div></div>
+        <div class="fields-grid two">
+          ${field("رقم العرض للزائر", `<input name="phoneDisplay" value="${esc(c.phoneDisplay)}">`)}
+          ${field("رقم الاتصال الدولي", `<input name="phoneTel" value="${esc(c.phoneTel)}" dir="ltr">`)}
+          ${field("واتساب بدون +", `<input name="whatsapp" value="${esc(c.whatsapp)}" dir="ltr">`)}
+          ${field("رابط فيسبوك", `<input name="facebook" value="${esc(c.facebook)}" dir="ltr">`)}
+        </div>
+        <div class="form-actions" style="margin-top:16px">
+          <button class="btn btn-purple" type="submit">حفظ بيانات التواصل</button>
+        </div>
+      </section>
     </form>`;
 }
 
 function settingsView() {
   return `
-    <p>كلمة المرور تُحفظ على السيرفر فقط ولن تظهر في صفحات الزوار.</p>
-    ${
-      phpReady
-        ? `<form data-password>
-            <label>كلمة مرور جديدة (8 أحرف على الأقل)<input type="password" name="password" minlength="8" required></label>
-            <button class="btn btn-purple" type="submit">تغيير كلمة المرور</button>
-          </form>`
-        : `<p>تغيير كلمة المرور يعمل بعد رفع الموقع على الاستضافة مع PHP.</p>`
-    }
-    <p>احفظوا نسخة JSON بعد كل تعديل مهم، ثم ارفعوها من «استعادة JSON» إذا اختفت التعديلات بعد نشر جديد.</p>
-    <p>رابط اللوحة للموبايل والكمبيوتر: <code>/admin.html</code></p>`;
+    <div class="settings-card">
+      <section class="panel">
+        <div class="panel-head"><div><h2>كلمة المرور</h2><p>تُحفظ على السيرفر فقط ولن تظهر في صفحات الزوار.</p></div></div>
+        ${
+          phpReady
+            ? `<form data-password class="fields-grid" style="max-width:420px">
+                ${field("كلمة مرور جديدة (8 أحرف على الأقل)", `<input type="password" name="password" minlength="8" required>`)}
+                <div class="form-actions"><button class="btn btn-purple" type="submit">تغيير كلمة المرور</button></div>
+              </form>`
+            : `<p class="help">تغيير كلمة المرور يعمل بعد رفع الموقع على الاستضافة مع PHP.</p>`
+        }
+      </section>
+      <section class="panel">
+        <div class="panel-head"><div><h2>النسخ الاحتياطي</h2><p>احفظوا JSON بعد كل تعديل مهم.</p></div></div>
+        <p class="help">إذا اختفت التعديلات بعد نشر جديد، ارفعوا الملف من «استعادة JSON» أعلى الصفحة ثم احفظوا على الموقع.</p>
+        <p class="help">رابط اللوحة: <strong>/admin.html</strong></p>
+      </section>
+    </div>`;
 }
 
 function render() {

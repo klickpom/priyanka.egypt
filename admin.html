@@ -13,7 +13,10 @@
 </head>
 <body>
   <script>
-    if (!document.querySelector('script[src*="/assets/admin"]')) {
+    if (
+      location.hostname.endsWith("priyanka-eg.shop") &&
+      !document.querySelector('script[src*="/assets/admin"]')
+    ) {
       location.replace("/dist/admin.html");
     }
   </script>
