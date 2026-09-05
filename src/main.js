@@ -12,8 +12,9 @@ import {
 document.documentElement.classList.remove("no-js");
 
 const page = document.body?.dataset.page || "home";
-const SPLASH_KEY = "priyanka-open-v6";
+const SPLASH_KEY = "priyanka-open-v7";
 const SPLASH_MS = 6400;
+const LAND_MS = 1680;
 
 function esc(value) {
   return String(value)
@@ -164,7 +165,9 @@ function unlockSplash() {
 }
 
 function landBrand() {
-  document.querySelector(".site")?.classList.add("is-landed");
+  const site = document.querySelector(".site");
+  site?.classList.remove("is-landing");
+  site?.classList.add("is-landed");
   unlockSplash();
 }
 
@@ -174,9 +177,13 @@ function revealSite() {
 }
 
 function flyLogoToHeader(splash) {
-  const fromEl = splash.querySelector(".splash-logo, .splash-mark img");
+  const fromEl =
+    splash.querySelector(".splash-logo-frame") ||
+    splash.querySelector(".splash-logo, .splash-mark img");
   const toEl = document.querySelector(".brand img");
-  if (!fromEl || !toEl || prefersReducedMotion()) {
+  const site = document.querySelector(".site");
+  const forceSplash = document.documentElement.classList.contains("splash-force");
+  if (!fromEl || !toEl || (prefersReducedMotion() && !forceSplash)) {
     revealSite();
     landBrand();
     splash.classList.add("is-done");
@@ -185,21 +192,58 @@ function flyLogoToHeader(splash) {
   }
 
   revealSite();
+  site?.classList.add("is-landing");
   const play = () => {
     const from = fromEl.getBoundingClientRect();
     const to = toEl.getBoundingClientRect();
     const dx = to.left + to.width / 2 - (from.left + from.width / 2);
     const dy = to.top + to.height / 2 - (from.top + from.height / 2);
-    const scale = Math.max(0.12, to.width / Math.max(from.width, 1));
-    fromEl.style.setProperty("--to-x", `${dx}px`);
-    fromEl.style.setProperty("--to-y", `${dy}px`);
-    fromEl.style.setProperty("--to-s", String(scale));
+    const scale = Math.max(0.14, to.width / Math.max(from.width, 1));
+    splash.style.setProperty("--land-x", `${to.left + to.width / 2}px`);
+    splash.style.setProperty("--land-y", `${to.top + to.height / 2}px`);
     splash.classList.add("is-exiting");
     splash.setAttribute("aria-hidden", "true");
+
+    const lift = Math.min(84, window.innerHeight * 0.08);
+    const midScale = Math.min(1.12, Math.max(scale * 1.42, 0.52));
+    if (typeof fromEl.animate === "function") {
+      fromEl.animate(
+        [
+          {
+            transform: "translate(0, 0) scale(1) rotate(0deg)",
+            filter:
+              "drop-shadow(0 28px 50px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 32px rgba(209, 45, 140, 0.42))",
+            offset: 0,
+          },
+          {
+            transform: `translate(${dx * 0.22}px, ${dy * 0.1 - lift}px) scale(${midScale}) rotate(-7deg)`,
+            filter:
+              "drop-shadow(0 24px 44px rgba(201, 162, 39, 0.42)) drop-shadow(0 0 56px rgba(209, 45, 140, 0.55))",
+            offset: 0.34,
+          },
+          {
+            transform: `translate(${dx}px, ${dy}px) scale(${scale}) rotate(0deg)`,
+            filter: "drop-shadow(0 10px 18px rgba(91, 26, 140, 0.28))",
+            offset: 1,
+          },
+        ],
+        {
+          duration: LAND_MS,
+          easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+          fill: "forwards",
+        }
+      );
+    } else {
+      fromEl.style.setProperty("--to-x", `${dx}px`);
+      fromEl.style.setProperty("--to-y", `${dy}px`);
+      fromEl.style.setProperty("--to-s", String(scale));
+      splash.classList.add("is-css-fly");
+    }
+
     window.setTimeout(() => {
       landBrand();
       splash.classList.add("is-done");
-    }, 1180);
+    }, LAND_MS + 60);
   };
   requestAnimationFrame(() => requestAnimationFrame(play));
 }
@@ -265,9 +309,12 @@ function drawSplashParticles(canvas) {
   };
 }
 
+let splashTimer = 0;
+
 function runSplash() {
   const splash = document.querySelector(".splash");
   const reduced = prefersReducedMotion();
+  window.clearTimeout(splashTimer);
 
   if (page !== "home" || !splash) {
     splash?.classList.add("is-done");
@@ -284,7 +331,7 @@ function runSplash() {
     document.documentElement.classList.add("splash-lock");
     splash.classList.add("is-lite");
     revealSite();
-    window.setTimeout(() => {
+    splashTimer = window.setTimeout(() => {
       sessionStorage.setItem(SPLASH_KEY, "1");
       landBrand();
       splash.classList.add("is-done");
@@ -308,13 +355,14 @@ function runSplash() {
   const finish = () => {
     if (closed) return;
     closed = true;
+    window.clearTimeout(splashTimer);
     sessionStorage.setItem(SPLASH_KEY, "1");
-    stopParticles();
     flyLogoToHeader(splash);
+    window.setTimeout(stopParticles, LAND_MS);
   };
 
-  splash.querySelector(".splash-skip")?.addEventListener("click", finish);
-  window.setTimeout(finish, SPLASH_MS);
+  splash.querySelector(".splash-skip")?.addEventListener("click", finish, { once: true });
+  splashTimer = window.setTimeout(finish, SPLASH_MS);
 }
 
 function cardHTML(product, index) {
