@@ -26,8 +26,8 @@ function esc(value) {
 function logoPicture(extraClass = "", width = 148, height = 86) {
   const cls = extraClass ? ` class="${extraClass}"` : "";
   return `<picture>
-            <source type="image/webp" srcset="/images/logo.webp?v=3d2">
-            <img${cls} src="/images/logo.png?v=3d2" alt="شعار بريانكا للتجميل" width="${width}" height="${height}">
+            <source type="image/webp" srcset="/images/logo.webp?v=3d3">
+            <img${cls} src="/images/logo.png?v=3d3" alt="شعار بريانكا للتجميل" width="${width}" height="${height}">
           </picture>`;
 }
 

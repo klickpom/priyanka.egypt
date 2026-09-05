@@ -8,31 +8,55 @@ if (!src) {
 
 const pngOut = "public/images/logo.png";
 const jpgOut = "public/images/logo.jpg";
+const webpOut = "public/images/logo.webp";
 
 const { data, info } = await sharp(src).ensureAlpha().raw().toBuffer({
   resolveWithObject: true,
 });
 const { width, height } = info;
-const visited = new Uint8Array(width * height);
-const queue = [];
 
 function idx(x, y) {
   return (y * width + x) * 4;
 }
 
-function bgScore(r, g, b) {
-  const min = Math.min(r, g, b);
-  const max = Math.max(r, g, b);
-  if (max - min > 34) return -1;
-  return min;
+function sample(x, y) {
+  const i = idx(x, y);
+  return [data[i], data[i + 1], data[i + 2]];
 }
+
+const corners = [
+  sample(0, 0),
+  sample(width - 1, 0),
+  sample(0, height - 1),
+  sample(width - 1, height - 1),
+];
+const cornerLuma =
+  corners.reduce((sum, [r, g, b]) => sum + Math.max(r, g, b), 0) / corners.length;
+const darkBg = cornerLuma < 80;
+
+function chroma(r, g, b) {
+  return Math.max(r, g, b) - Math.min(r, g, b);
+}
+
+function bgAmount(r, g, b) {
+  if (chroma(r, g, b) > 32) return -1;
+  if (darkBg) {
+    const mx = Math.max(r, g, b);
+    return mx <= 36 ? 36 - mx : -1;
+  }
+  const mn = Math.min(r, g, b);
+  return mn >= 218 ? mn - 217 : -1;
+}
+
+const visited = new Uint8Array(width * height);
+const queue = [];
 
 function enqueue(x, y) {
   if (x < 0 || y < 0 || x >= width || y >= height) return;
   const p = y * width + x;
   if (visited[p]) return;
   const i = idx(x, y);
-  if (bgScore(data[i], data[i + 1], data[i + 2]) < 218) return;
+  if (bgAmount(data[i], data[i + 1], data[i + 2]) < 0) return;
   visited[p] = 1;
   queue.push(x, y);
 }
@@ -47,12 +71,16 @@ for (let y = 0; y < height; y += 1) {
 }
 
 for (let n = 0; n < queue.length; n += 2) {
-  const x = queue[n];
-  const y = queue[n + 1];
-  enqueue(x + 1, y);
-  enqueue(x - 1, y);
-  enqueue(x, y + 1);
-  enqueue(x, y - 1);
+  enqueue(queue[n] + 1, queue[n + 1]);
+  enqueue(queue[n] - 1, queue[n + 1]);
+  enqueue(queue[n], queue[n + 1] + 1);
+  enqueue(queue[n], queue[n + 1] - 1);
+}
+
+for (let y = 0; y < height; y += 1) {
+  for (let x = 0; x < width; x += 1) {
+    enqueue(x, y);
+  }
 }
 
 let cleared = 0;
@@ -61,18 +89,31 @@ for (let y = 0; y < height; y += 1) {
     const p = y * width + x;
     if (!visited[p]) continue;
     const i = idx(x, y);
-    const score = bgScore(data[i], data[i + 1], data[i + 2]);
+    const amount = bgAmount(data[i], data[i + 1], data[i + 2]);
+    if (amount < 0) continue;
     let alpha = 255;
-    if (score >= 247) alpha = 0;
-    else if (score >= 218) alpha = Math.round(((247 - score) / 29) * 255);
+    if (darkBg) {
+      const mx = Math.max(data[i], data[i + 1], data[i + 2]);
+      if (mx <= 8) alpha = 0;
+      else if (mx <= 36) alpha = Math.round(((mx - 8) / 28) * 255);
+    } else {
+      const score = Math.min(data[i], data[i + 1], data[i + 2]);
+      if (score >= 247) alpha = 0;
+      else if (score >= 218) alpha = Math.round(((247 - score) / 29) * 255);
+    }
     data[i + 3] = Math.min(data[i + 3], alpha);
-    if (alpha < 16) cleared += 1;
+    if (alpha < 16) {
+      data[i] = 0;
+      data[i + 1] = 0;
+      data[i + 2] = 0;
+      cleared += 1;
+    }
   }
 }
 
 let png = sharp(data, { raw: { width, height, channels: 4 } });
 try {
-  png = png.trim({ threshold: 10 });
+  png = png.trim({ threshold: 12 });
 } catch {
   /* keep full frame */
 }
@@ -82,8 +123,11 @@ await png
   .png({ compressionLevel: 9 })
   .toFile(pngOut);
 
-const cut = sharp(pngOut);
-const meta = await cut.metadata();
+await sharp(pngOut)
+  .webp({ quality: 88, alphaQuality: 100, effort: 6 })
+  .toFile(webpOut);
+
+const meta = await sharp(pngOut).metadata();
 const side = Math.max(meta.width || 1200, meta.height || 1200, 1200);
 await sharp({
   create: {
@@ -98,6 +142,7 @@ await sharp({
   .toFile(jpgOut);
 
 const outMeta = await sharp(pngOut).metadata();
+console.log(`mode ${darkBg ? "dark" : "light"}`);
 console.log(`cleared ${cleared} px`);
 console.log(`png ${outMeta.width}x${outMeta.height}`);
-console.log(`wrote ${pngOut} and ${jpgOut}`);
+console.log(`wrote ${pngOut}, ${webpOut} and ${jpgOut}`);
